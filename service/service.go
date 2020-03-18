@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/stripe/stripe-go"
 	accountsv1 "github.com/videocoin/cloud-api/accounts/v1"
 	"github.com/videocoin/cloud-billing/datastore"
 	"github.com/videocoin/cloud-billing/eventbus"
@@ -56,6 +57,8 @@ func NewService(cfg *Config) (*Service, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	stripe.Key = cfg.StripeKey
 
 	svc := &Service{
 		cfg: cfg,

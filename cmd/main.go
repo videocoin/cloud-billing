@@ -63,7 +63,7 @@ func main() {
 	}()
 
 	log.Info("starting")
-	go log.Error(svc.Start())
+	go svc.Start()
 
 	<-exit
 

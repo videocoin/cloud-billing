@@ -48,6 +48,7 @@ func NewServer(opts *ServerOpts) (*Server, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	rpcServer := &Server{
 		addr:     opts.Addr,
 		logger:   opts.Logger.WithField("system", "rpc"),

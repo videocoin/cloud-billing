@@ -18,6 +18,7 @@ service BillingService {
     rpc MakePayment(MakePaymentRequest) returns (MakePaymentResponse) {
         option (google.api.http) = {
             post: "/api/v1/billing/payment"
+            body: "*"
         };
     }
 
@@ -29,7 +30,7 @@ service BillingService {
 }
 
 message MakePaymentRequest {
-    double amount = 1;
+    int64 amount = 1;
 }
 
 message MakePaymentResponse {
