@@ -15,20 +15,22 @@ import (
 )
 
 type ServerOpts struct {
-	Logger   *logrus.Entry
-	Addr     string
-	DM       *datastore.DataManager
-	Accounts accountsv1.AccountServiceClient
+	Logger     *logrus.Entry
+	Addr       string
+	StripeOpts *StripeOpts
+	DM         *datastore.DataManager
+	Accounts   accountsv1.AccountServiceClient
 }
 
 type Server struct {
-	logger   *logrus.Entry
-	addr     string
-	grpc     *grpc.Server
-	listen   net.Listener
-	v        *requestValidator
-	dm       *datastore.DataManager
-	accounts accountsv1.AccountServiceClient
+	logger     *logrus.Entry
+	addr       string
+	grpc       *grpc.Server
+	listen     net.Listener
+	v          *requestValidator
+	dm         *datastore.DataManager
+	accounts   accountsv1.AccountServiceClient
+	stripeOpts *StripeOpts
 }
 
 func NewServer(opts *ServerOpts) (*Server, error) {
@@ -50,13 +52,14 @@ func NewServer(opts *ServerOpts) (*Server, error) {
 	}
 
 	rpcServer := &Server{
-		addr:     opts.Addr,
-		logger:   opts.Logger.WithField("system", "rpc"),
-		v:        validator,
-		grpc:     grpcServer,
-		listen:   listen,
-		accounts: opts.Accounts,
-		dm:       opts.DM,
+		addr:       opts.Addr,
+		logger:     opts.Logger.WithField("system", "rpc"),
+		v:          validator,
+		grpc:       grpcServer,
+		listen:     listen,
+		accounts:   opts.Accounts,
+		dm:         opts.DM,
+		stripeOpts: opts.StripeOpts,
 	}
 
 	v1.RegisterBillingServiceServer(grpcServer, rpcServer)

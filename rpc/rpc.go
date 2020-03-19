@@ -2,7 +2,9 @@ package rpc
 
 import (
 	"context"
-	
+	"fmt"
+
+	protoempty "github.com/gogo/protobuf/types"
 	"github.com/stripe/stripe-go"
 	stripeSess "github.com/stripe/stripe-go/checkout/session"
 	v1 "github.com/videocoin/cloud-api/billing/v1"
@@ -11,9 +13,7 @@ import (
 
 func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*v1.MakePaymentResponse, error) {
 	params := &stripe.CheckoutSessionParams{
-		PaymentMethodTypes: stripe.StringSlice([]string{
-			"card",
-		}),
+		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			&stripe.CheckoutSessionLineItemParams{
 				Name:        stripe.String("Videcoin Payment"),
@@ -23,8 +23,16 @@ func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*
 				Quantity:    stripe.Int64(1),
 			},
 		},
-		SuccessURL: stripe.String("https://studio.dev.videcoin.network/billing/payments/success?session_id={CHECKOUT_SESSION_ID}"),
-		CancelURL:  stripe.String("https://studio.dev.videcoin.network/billing/payments/cancel"),
+		SuccessURL: stripe.String(
+			fmt.Sprintf(
+				"%s/api/v1/billing/stripe/{CHECKOUT_SESSION_ID}/success",
+				s.stripeOpts.BaseCallbackURL,
+			)),
+		CancelURL: stripe.String(
+			fmt.Sprintf(
+				"%s/api/v1/billing/stripe/cancel",
+				s.stripeOpts.BaseCallbackURL,
+			)),
 	}
 
 	session, err := stripeSess.New(params)
@@ -42,4 +50,14 @@ func (s *Server) GetTransactions(ctx context.Context, req *v1.TransactionRequest
 	return &v1.TransactionListResponse{
 		Items: []*v1.TransactionResponse{},
 	}, nil
+}
+
+func (s *Server) SuccessStripeCallback(ctx context.Context, req *v1.StripePaymentRequest) (*protoempty.Empty, error) {
+	logger := s.logger.WithField("session_id", req.SessionId)
+	logger.Info("stripe payment succeed")
+	return &protoempty.Empty{}, nil
+}
+
+func (s *Server) CancelStripeCallback(ctx context.Context, req *protoempty.Empty) (*protoempty.Empty, error) {
+	return &protoempty.Empty{}, nil
 }

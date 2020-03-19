@@ -40,6 +40,9 @@ func NewService(cfg *Config) (*Service, error) {
 		Logger:   cfg.Logger,
 		Accounts: accounts,
 		DM:       dm,
+		StripeOpts: &rpc.StripeOpts{
+			BaseCallbackURL: cfg.StripeBaseCallbackURL,
+		},
 	}
 
 	rpc, err := rpc.NewServer(rpcConfig)
