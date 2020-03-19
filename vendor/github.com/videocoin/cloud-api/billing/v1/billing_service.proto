@@ -17,7 +17,7 @@ option (gogoproto.messagename_all) = true;
 service BillingService {
     rpc MakePayment(MakePaymentRequest) returns (MakePaymentResponse) {
         option (google.api.http) = {
-            post: "/api/v1/billing/payment"
+            post: "/api/v1/billing/pay"
             body: "*"
         };
     }
@@ -25,6 +25,18 @@ service BillingService {
     rpc GetTransactions(TransactionRequest) returns (TransactionListResponse) {
         option (google.api.http) = {
             get: "/api/v1/billing/transactions"
+        };
+    }
+
+    rpc SuccessStripeCallback(StripePaymentRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            get: "/api/v1/billing/stripe/{session_id}/success"
+        };
+    }
+
+    rpc CancelStripeCallback(google.protobuf.Empty) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            get: "/api/v1/billing/stripe/cancel"
         };
     }
 }
@@ -43,4 +55,8 @@ message TransactionResponse {}
 
 message TransactionListResponse  {
     repeated TransactionResponse items = 1;
+}
+
+message StripePaymentRequest {
+    string session_id = 1;
 }
