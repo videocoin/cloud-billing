@@ -84,10 +84,11 @@ github.com/prometheus/procfs/internal/fs
 github.com/sirupsen/logrus
 # github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94
 github.com/streadway/amqp
-# github.com/stripe/stripe-go v70.5.0+incompatible
+# github.com/stripe/stripe-go v70.7.0+incompatible
 github.com/stripe/stripe-go
 github.com/stripe/stripe-go/checkout/session
 github.com/stripe/stripe-go/form
+github.com/stripe/stripe-go/paymentintent
 # github.com/uber/jaeger-client-go v2.16.0+incompatible
 github.com/uber/jaeger-client-go
 github.com/uber/jaeger-client-go/config

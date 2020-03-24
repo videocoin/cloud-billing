@@ -6,7 +6,8 @@ import (
 
 	protoempty "github.com/gogo/protobuf/types"
 	"github.com/stripe/stripe-go"
-	stripeSess "github.com/stripe/stripe-go/checkout/session"
+	checkout "github.com/stripe/stripe-go/checkout/session"
+	"github.com/stripe/stripe-go/paymentintent"
 	v1 "github.com/videocoin/cloud-api/billing/v1"
 	"github.com/videocoin/cloud-api/rpc"
 )
@@ -35,7 +36,7 @@ func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*
 			)),
 	}
 
-	session, err := stripeSess.New(params)
+	session, err := checkout.New(params)
 	if err != nil {
 		s.logger.Errorf("failed to stripe session: %s", err)
 		return nil, rpc.ErrRpcInternal
@@ -55,6 +56,30 @@ func (s *Server) GetTransactions(ctx context.Context, req *v1.TransactionRequest
 func (s *Server) SuccessStripeCallback(ctx context.Context, req *v1.StripePaymentRequest) (*protoempty.Empty, error) {
 	logger := s.logger.WithField("session_id", req.SessionId)
 	logger.Info("stripe payment succeed")
+
+	session, err := checkout.Get(req.SessionId, nil)
+	if err != nil {
+		logger.Errorf("failed to get checkout: %s", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	if session.PaymentIntent != nil && session.PaymentIntent.ID != "" {
+		logger := logger.WithField("payment_intent_id", session.PaymentIntent.ID)
+
+		pi, err := paymentintent.Get(session.PaymentIntent.ID, nil)
+		if err != nil {
+			logger.Errorf("failed to get payment intent: %s", err)
+			return nil, rpc.ErrRpcBadRequest
+		}
+
+		session.PaymentIntent = pi
+
+		logger.Infof("payment intent status is %s", pi.Status)
+
+		if pi.Status == stripe.PaymentIntentStatusSucceeded {
+		}
+	}
+
 	return &protoempty.Empty{}, nil
 }
 

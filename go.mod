@@ -17,7 +17,7 @@ require (
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mailru/dbr v3.0.0+incompatible
 	github.com/sirupsen/logrus v1.4.2
-	github.com/stripe/stripe-go v70.5.0+incompatible
+	github.com/stripe/stripe-go v70.7.0+incompatible
 	github.com/videocoin/cloud-api v0.0.17
 	github.com/videocoin/cloud-pkg v0.0.5
 	google.golang.org/grpc v1.28.0
