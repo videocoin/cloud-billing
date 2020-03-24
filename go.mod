@@ -7,7 +7,7 @@ replace github.com/videocoin/cloud-api => ../cloud-api
 replace github.com/videocoin/cloud-pkg => ../cloud-pkg
 
 require (
-	github.com/AlekSi/pointer v1.1.0 // indirect
+	github.com/AlekSi/pointer v1.1.0
 	github.com/aws/aws-sdk-go v1.29.27 // indirect
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0

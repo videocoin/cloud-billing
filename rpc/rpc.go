@@ -10,6 +10,7 @@ import (
 	"github.com/stripe/stripe-go/paymentintent"
 	v1 "github.com/videocoin/cloud-api/billing/v1"
 	"github.com/videocoin/cloud-api/rpc"
+	"github.com/videocoin/cloud-billing/datastore"
 )
 
 func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*v1.MakePaymentResponse, error) {
@@ -42,8 +43,22 @@ func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*
 		return nil, rpc.ErrRpcInternal
 	}
 
+	transaction := &datastore.Transaction{
+		AccountID:         "test-account-id",
+		CheckoutSessionID: session.ID,
+		Type:              v1.TransactionTypeDebit,
+		Amount:            req.Amount,
+		PaymentStatus:     stripe.PaymentIntentStatusRequiresPaymentMethod,
+	}
+
+	err = s.dm.CreateTransaction(ctx, transaction)
+	if err != nil {
+		s.logger.Errorf("failed to create transaction: %s", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
 	return &v1.MakePaymentResponse{
-		SessionId: session.ID,
+		SessionId: transaction.CheckoutSessionID,
 	}, nil
 }
 
@@ -76,7 +91,16 @@ func (s *Server) SuccessStripeCallback(ctx context.Context, req *v1.StripePaymen
 
 		logger.Infof("payment intent status is %s", pi.Status)
 
-		if pi.Status == stripe.PaymentIntentStatusSucceeded {
+		transaction, err := s.dm.GetTransactionByCheckoutSessionID(ctx, req.SessionId)
+		if err != nil {
+			logger.Errorf("failed to get payment intent: %s", err)
+			return nil, rpc.ErrRpcInternal
+		}
+
+		err = s.dm.UpdateTransactionPaymentIntent(ctx, transaction, pi)
+		if err != nil {
+			logger.Errorf("failed to update payment intent: %s", err)
+			return nil, rpc.ErrRpcInternal
 		}
 	}
 

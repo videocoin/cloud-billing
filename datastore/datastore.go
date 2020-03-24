@@ -7,6 +7,9 @@ import (
 
 type Datastore struct {
 	conn *dbr.Connection
+
+	Accounts     *AccountDatastore
+	Transactions *TransactionDatastore
 }
 
 func NewDatastore(uri string) (*Datastore, error) {
@@ -23,6 +26,20 @@ func NewDatastore(uri string) (*Datastore, error) {
 	}
 
 	ds.conn = conn
+
+	accountDs, err := NewAccountDatastore(conn)
+	if err != nil {
+		return nil, err
+	}
+
+	ds.Accounts = accountDs
+
+	txDs, err := NewTransactionDatastore(conn)
+	if err != nil {
+		return nil, err
+	}
+
+	ds.Transactions = txDs
 
 	return ds, nil
 }
