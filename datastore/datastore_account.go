@@ -67,3 +67,36 @@ func (ds *AccountDatastore) Create(ctx context.Context, account *Account) error 
 
 	return nil
 }
+
+func (ds *AccountDatastore) GetByUserID(ctx context.Context, userID string) (*Account, error) {
+	var err error
+
+	sess, ok := DbSessionFromContext(ctx)
+	if !ok || sess == nil {
+		sess = ds.conn.NewSession(nil)
+	}
+
+	tx, ok := DbTxFromContext(ctx)
+	if !ok || tx == nil {
+		tx, err = sess.Begin()
+		if err != nil {
+			return nil, err
+		}
+
+		defer func() {
+			tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
+	}
+
+	account := new(Account)
+	_, err = tx.Select("*").From(ds.table).Where("user_id = ?", userID).Load(account)
+	if err != nil {
+		if err == dbr.ErrNotFound {
+			return nil, ErrAccountNotFound
+		}
+		return nil, err
+	}
+
+	return account, nil
+}

@@ -3,11 +3,11 @@ package service
 import (
 	"github.com/stripe/stripe-go"
 	accountsv1 "github.com/videocoin/cloud-api/accounts/v1"
+	usersv1 "github.com/videocoin/cloud-api/users/v1"
 	"github.com/videocoin/cloud-billing/datastore"
 	"github.com/videocoin/cloud-billing/eventbus"
 	"github.com/videocoin/cloud-billing/rpc"
 	"github.com/videocoin/cloud-pkg/grpcutil"
-	"google.golang.org/grpc"
 )
 
 type Service struct {
@@ -17,13 +17,14 @@ type Service struct {
 }
 
 func NewService(cfg *Config) (*Service, error) {
-	alogger := cfg.Logger.WithField("system", "accountcli")
-	aGrpcDialOpts := grpcutil.ClientDialOptsWithRetry(alogger)
-	accountsConn, err := grpc.Dial(cfg.AccountsRPCAddr, aGrpcDialOpts...)
+	conn, err := grpcutil.Connect(cfg.AccountsRPCAddr, cfg.Logger.WithField("system", "accountscli"))
+	accounts := accountsv1.NewAccountServiceClient(conn)
+
+	conn, err = grpcutil.Connect(cfg.UsersRPCAddr, cfg.Logger.WithField("system", "userscli"))
 	if err != nil {
 		return nil, err
 	}
-	accounts := accountsv1.NewAccountServiceClient(accountsConn)
+	users := usersv1.NewUserServiceClient(conn)
 
 	ds, err := datastore.NewDatastore(cfg.DBURI)
 	if err != nil {
@@ -36,10 +37,12 @@ func NewService(cfg *Config) (*Service, error) {
 	}
 
 	rpcConfig := &rpc.ServerOpts{
-		Addr:     cfg.RPCAddr,
-		Logger:   cfg.Logger,
-		Accounts: accounts,
-		DM:       dm,
+		Logger:          cfg.Logger,
+		Addr:            cfg.RPCAddr,
+		AuthTokenSecret: cfg.AuthTokenSecret,
+		Accounts:        accounts,
+		Users:           users,
+		DM:              dm,
 		StripeOpts: &rpc.StripeOpts{
 			BaseCallbackURL: cfg.StripeBaseCallbackURL,
 		},

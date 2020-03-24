@@ -14,6 +14,26 @@ import (
 )
 
 func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*v1.MakePaymentResponse, error) {
+	userID, err := s.authenticate(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	account, err := s.dm.GetAccountByUserID(ctx, userID)
+	if err != nil {
+		if err == datastore.ErrAccountNotFound {
+			account = &datastore.Account{UserID: userID}
+			createErr := s.dm.CreateAccount(ctx, account)
+			if createErr != nil {
+				s.logger.Errorf("failed to create account: %s", createErr)
+				return nil, rpc.ErrRpcInternal
+			}
+		}
+
+		s.logger.Errorf("failed to get account by user id: %s", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
 	params := &stripe.CheckoutSessionParams{
 		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
@@ -44,7 +64,7 @@ func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*
 	}
 
 	transaction := &datastore.Transaction{
-		AccountID:         "test-account-id",
+		AccountID:         account.ID,
 		CheckoutSessionID: session.ID,
 		Type:              v1.TransactionTypeDebit,
 		Amount:            req.Amount,
@@ -100,8 +120,6 @@ func (s *Server) SuccessStripeCallback(ctx context.Context, req *v1.StripePaymen
 			logger.Warningf("failed to get payment intent: %s", err)
 			return nil, rpc.ErrRpcBadRequest
 		}
-
-		session.PaymentIntent = pi
 
 		logger.Infof("payment intent status is %s", pi.Status)
 

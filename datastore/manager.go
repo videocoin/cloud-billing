@@ -34,6 +34,41 @@ func (m *DataManager) NewContext(ctx context.Context) (context.Context, *dbr.Ses
 	return ctx, sess, tx, err
 }
 
+func (m *DataManager) CreateAccount(ctx context.Context, account *Account) error {
+	ctx, _, tx, err := m.NewContext(ctx)
+	if err != nil {
+		return failedTo("create account", err)
+	}
+	defer tx.RollbackUnlessCommitted()
+
+	err = m.ds.Accounts.Create(ctx, account)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func (m *DataManager) GetAccountByUserID(ctx context.Context, userID string) (*Account, error) {
+	ctx, _, tx, err := m.NewContext(ctx)
+	if err != nil {
+		return nil, failedTo("get account by user id", err)
+	}
+	defer tx.RollbackUnlessCommitted()
+
+	account, err := m.ds.Accounts.GetByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
+
+	return account, nil
+}
+
 func (m *DataManager) CreateTransaction(ctx context.Context, transaction *Transaction) error {
 	ctx, _, tx, err := m.NewContext(ctx)
 	if err != nil {
