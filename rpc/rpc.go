@@ -72,10 +72,24 @@ func (s *Server) SuccessStripeCallback(ctx context.Context, req *v1.StripePaymen
 	logger := s.logger.WithField("session_id", req.SessionId)
 	logger.Info("stripe payment succeed")
 
-	session, err := checkout.Get(req.SessionId, nil)
+	transaction, err := s.dm.GetTransactionByCheckoutSessionID(ctx, req.SessionId)
 	if err != nil {
-		logger.Errorf("failed to get checkout: %s", err)
+		if err == datastore.ErrTxNotFound {
+			return nil, rpc.ErrRpcBadRequest
+		}
+
+		logger.Errorf("failed to get transaction by checkout session id: %s", err)
 		return nil, rpc.ErrRpcInternal
+	}
+
+	if transaction.PaymentStatus == stripe.PaymentIntentStatusSucceeded {
+		return nil, rpc.ErrRpcBadRequest
+	}
+
+	session, err := checkout.Get(transaction.CheckoutSessionID, nil)
+	if err != nil {
+		logger.Warningf("failed to get checkout: %s", err)
+		return nil, rpc.ErrRpcBadRequest
 	}
 
 	if session.PaymentIntent != nil && session.PaymentIntent.ID != "" {
@@ -83,19 +97,13 @@ func (s *Server) SuccessStripeCallback(ctx context.Context, req *v1.StripePaymen
 
 		pi, err := paymentintent.Get(session.PaymentIntent.ID, nil)
 		if err != nil {
-			logger.Errorf("failed to get payment intent: %s", err)
+			logger.Warningf("failed to get payment intent: %s", err)
 			return nil, rpc.ErrRpcBadRequest
 		}
 
 		session.PaymentIntent = pi
 
 		logger.Infof("payment intent status is %s", pi.Status)
-
-		transaction, err := s.dm.GetTransactionByCheckoutSessionID(ctx, req.SessionId)
-		if err != nil {
-			logger.Errorf("failed to get payment intent: %s", err)
-			return nil, rpc.ErrRpcInternal
-		}
 
 		err = s.dm.UpdateTransactionPaymentIntent(ctx, transaction, pi)
 		if err != nil {
