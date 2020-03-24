@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	ErrAccountNotFound = errors.New("account is not found")
+	ErrAccountNotFound = errors.New("account not found")
 )
 
 type AccountDatastore struct {
@@ -90,7 +90,7 @@ func (ds *AccountDatastore) GetByUserID(ctx context.Context, userID string) (*Ac
 	}
 
 	account := new(Account)
-	_, err = tx.Select("*").From(ds.table).Where("user_id = ?", userID).Load(account)
+	err = tx.Select("*").From(ds.table).Where("user_id = ?", userID).LoadStruct(account)
 	if err != nil {
 		if err == dbr.ErrNotFound {
 			return nil, ErrAccountNotFound

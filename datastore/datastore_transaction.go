@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	ErrTxNotFound = errors.New("transaction is not found")
+	ErrTxNotFound = errors.New("transaction not found")
 )
 
 type TransactionDatastore struct {
@@ -125,7 +125,7 @@ func (ds *TransactionDatastore) GetByCheckoutSessionID(ctx context.Context, chec
 	}
 
 	transaction := new(Transaction)
-	_, err = tx.Select("*").From(ds.table).Where("checkout_session_id = ?", checkoutSessionID).Load(transaction)
+	err = tx.Select("*").From(ds.table).Where("checkout_session_id = ?", checkoutSessionID).LoadStruct(transaction)
 	if err != nil {
 		if err == dbr.ErrNotFound {
 			return nil, ErrTxNotFound
