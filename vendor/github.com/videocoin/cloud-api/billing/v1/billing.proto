@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package cloud.api.billing.v1;
 
-import "google/protobuf/timestamp.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 
 option go_package = "v1";
@@ -12,4 +11,11 @@ option (gogoproto.sizer_all) = true;
 option (gogoproto.goproto_registration) = true;
 option (gogoproto.messagename_all) = true;
 
-message Profile {}
+enum TransactionType {
+    option (gogoproto.goproto_enum_prefix) = false;
+    option (gogoproto.enum_customname) = "TransactionType";
+
+    UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "TransactionTypeUnknown"];
+    DEBIT = 1 [(gogoproto.enumvalue_customname) = "TransactionTypeDebit"];
+    CREDIT = 2 [(gogoproto.enumvalue_customname) = "TransactionTypeCredit"];
+}
