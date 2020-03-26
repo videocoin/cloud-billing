@@ -15,16 +15,6 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-type ServerOpts struct {
-	Logger          *logrus.Entry
-	Addr            string
-	AuthTokenSecret string
-	StripeOpts      *StripeOpts
-	DM              *manager.Manager
-	Users           usersv1.UserServiceClient
-	Accounts        accountsv1.AccountServiceClient
-}
-
 type Server struct {
 	logger          *logrus.Entry
 	addr            string
