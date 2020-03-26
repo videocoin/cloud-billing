@@ -40,6 +40,9 @@ func NewService(cfg *Config) (*Service, error) {
 		rpc.WithStripeOpts(stripeOpts),
 		rpc.WithUsersServiceClient(cfg.UsersRPCAddr),
 	)
+	if err != nil {
+		return nil, err
+	}
 
 	ebConfig := &eventbus.Config{
 		URI:    cfg.MQURI,
