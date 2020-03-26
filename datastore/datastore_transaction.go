@@ -7,6 +7,7 @@ import (
 
 	"github.com/mailru/dbr"
 	"github.com/stripe/stripe-go"
+	"github.com/videocoin/cloud-pkg/dbrutil"
 	"github.com/videocoin/cloud-pkg/uuid4"
 )
 
@@ -27,7 +28,7 @@ func NewTransactionDatastore(conn *dbr.Connection) (*TransactionDatastore, error
 }
 
 func (ds *TransactionDatastore) Create(ctx context.Context, transaction *Transaction) error {
-	tx, ok := DbTxFromContext(ctx)
+	tx, ok := dbrutil.DbTxFromContext(ctx)
 	if !ok {
 		sess := ds.conn.NewSession(nil)
 		tx, err := sess.Begin()
@@ -64,7 +65,7 @@ func (ds *TransactionDatastore) Create(ctx context.Context, transaction *Transac
 }
 
 func (ds *TransactionDatastore) UpdatePaymentIntent(ctx context.Context, transaction *Transaction, paymentIntent *stripe.PaymentIntent) error {
-	tx, ok := DbTxFromContext(ctx)
+	tx, ok := dbrutil.DbTxFromContext(ctx)
 	if !ok {
 		sess := ds.conn.NewSession(nil)
 		tx, err := sess.Begin()
@@ -92,7 +93,7 @@ func (ds *TransactionDatastore) UpdatePaymentIntent(ctx context.Context, transac
 }
 
 func (ds *TransactionDatastore) GetByCheckoutSessionID(ctx context.Context, checkoutSessionID string) (*Transaction, error) {
-	tx, ok := DbTxFromContext(ctx)
+	tx, ok := dbrutil.DbTxFromContext(ctx)
 	if !ok {
 		sess := ds.conn.NewSession(nil)
 		tx, err := sess.Begin()

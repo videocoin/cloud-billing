@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/mailru/dbr"
+	"github.com/videocoin/cloud-pkg/dbrutil"
 	"github.com/videocoin/cloud-pkg/uuid4"
 )
 
@@ -26,7 +27,7 @@ func NewAccountDatastore(conn *dbr.Connection) (*AccountDatastore, error) {
 }
 
 func (ds *AccountDatastore) Create(ctx context.Context, account *Account) error {
-	tx, ok := DbTxFromContext(ctx)
+	tx, ok := dbrutil.DbTxFromContext(ctx)
 	if !ok {
 		sess := ds.conn.NewSession(nil)
 		tx, err := sess.Begin()
@@ -63,7 +64,7 @@ func (ds *AccountDatastore) Create(ctx context.Context, account *Account) error 
 }
 
 func (ds *AccountDatastore) GetByUserID(ctx context.Context, userID string) (*Account, error) {
-	tx, ok := DbTxFromContext(ctx)
+	tx, ok := dbrutil.DbTxFromContext(ctx)
 	if !ok {
 		sess := ds.conn.NewSession(nil)
 		tx, err := sess.Begin()

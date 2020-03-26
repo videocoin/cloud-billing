@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stripe/stripe-go"
 	"github.com/videocoin/cloud-billing/datastore"
+	"github.com/videocoin/cloud-pkg/dbrutil"
 )
 
 type Manager struct {
@@ -26,15 +27,15 @@ func New(opts ...Option) (*Manager, error) {
 }
 
 func (m *Manager) NewContext(ctx context.Context) (context.Context, *dbr.Session, *dbr.Tx, error) {
-	dbLogger := datastore.NewDatastoreLogger(m.logger)
+	dbLogger := dbrutil.NewDatastoreLogger(m.logger)
 	sess := m.ds.NewSession(dbLogger)
 	tx, err := sess.Begin()
 	if err != nil {
 		return ctx, nil, nil, err
 	}
 
-	ctx = datastore.NewContextWithDbSession(ctx, sess)
-	ctx = datastore.NewContextWithDbTx(ctx, tx)
+	ctx = dbrutil.NewContextWithDbSession(ctx, sess)
+	ctx = dbrutil.NewContextWithDbTx(ctx, tx)
 
 	return ctx, sess, tx, err
 }
