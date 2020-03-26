@@ -40,12 +40,12 @@ func (ds *TransactionDatastore) Create(ctx context.Context, transaction *Transac
 		if err != nil {
 			return err
 		}
-
-		defer func() {
-			tx.Commit()
-			tx.RollbackUnlessCommitted()
-		}()
 	}
+
+	defer func() {
+		err = tx.Commit()
+		tx.RollbackUnlessCommitted()
+	}()
 
 	if transaction.ID == "" {
 		id, err := uuid4.New()
@@ -83,12 +83,12 @@ func (ds *TransactionDatastore) UpdatePaymentIntent(ctx context.Context, transac
 		if err != nil {
 			return err
 		}
-
-		defer func() {
-			tx.Commit()
-			tx.RollbackUnlessCommitted()
-		}()
 	}
+
+	defer func() {
+		err = tx.Commit()
+		tx.RollbackUnlessCommitted()
+	}()
 
 	transaction.PaymentIntentID = paymentIntent.ID
 	transaction.PaymentStatus = paymentIntent.Status
@@ -117,12 +117,12 @@ func (ds *TransactionDatastore) GetByCheckoutSessionID(ctx context.Context, chec
 		if err != nil {
 			return nil, err
 		}
-
-		defer func() {
-			tx.Commit()
-			tx.RollbackUnlessCommitted()
-		}()
 	}
+
+	defer func() {
+		err = tx.Commit()
+		tx.RollbackUnlessCommitted()
+	}()
 
 	transaction := new(Transaction)
 	err = tx.Select("*").From(ds.table).Where("checkout_session_id = ?", checkoutSessionID).LoadStruct(transaction)

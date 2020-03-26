@@ -39,12 +39,12 @@ func (ds *AccountDatastore) Create(ctx context.Context, account *Account) error 
 		if err != nil {
 			return err
 		}
-
-		defer func() {
-			tx.Commit()
-			tx.RollbackUnlessCommitted()
-		}()
 	}
+
+	defer func() {
+		err = tx.Commit()
+		tx.RollbackUnlessCommitted()
+	}()
 
 	if account.ID == "" {
 		id, err := uuid4.New()
@@ -82,12 +82,12 @@ func (ds *AccountDatastore) GetByUserID(ctx context.Context, userID string) (*Ac
 		if err != nil {
 			return nil, err
 		}
-
-		defer func() {
-			tx.Commit()
-			tx.RollbackUnlessCommitted()
-		}()
 	}
+
+	defer func() {
+		err = tx.Commit()
+		tx.RollbackUnlessCommitted()
+	}()
 
 	account := new(Account)
 	err = tx.Select("*").From(ds.table).Where("user_id = ?", userID).LoadStruct(account)

@@ -18,6 +18,9 @@ type Service struct {
 
 func NewService(cfg *Config) (*Service, error) {
 	conn, err := grpcutil.Connect(cfg.AccountsRPCAddr, cfg.Logger.WithField("system", "accountscli"))
+	if err != nil {
+		return nil, err
+	}
 	accounts := accountsv1.NewAccountServiceClient(conn)
 
 	conn, err = grpcutil.Connect(cfg.UsersRPCAddr, cfg.Logger.WithField("system", "userscli"))
@@ -75,14 +78,16 @@ func NewService(cfg *Config) (*Service, error) {
 	return svc, nil
 }
 
-func (s *Service) Start() error {
-	s.cfg.Logger.Info("starting rpc server")
-	go s.rpc.Start() //nolint
+func (s *Service) Start(errCh chan error) {
+	go func() {
+		s.cfg.Logger.Info("starting rpc server")
+		errCh <- s.rpc.Start()
+	}()
 
-	s.cfg.Logger.Info("starting eventbus")
-	go s.eb.Start() //nolint
-
-	return nil
+	go func() {
+		s.cfg.Logger.Info("starting eventbus")
+		errCh <- s.eb.Start()
+	}()
 }
 
 func (s *Service) Stop() error {

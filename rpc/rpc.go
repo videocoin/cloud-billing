@@ -37,7 +37,7 @@ func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*
 	params := &stripe.CheckoutSessionParams{
 		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
-			&stripe.CheckoutSessionLineItemParams{
+			{
 				Name:        stripe.String("Videcoin Payment"),
 				Description: stripe.String("Videcoin Payment Description"),
 				Amount:      stripe.Int64(req.Amount),
