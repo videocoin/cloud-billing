@@ -9,7 +9,7 @@ import (
 	v1 "github.com/videocoin/cloud-api/billing/v1"
 	"github.com/videocoin/cloud-api/rpc"
 	usersv1 "github.com/videocoin/cloud-api/users/v1"
-	"github.com/videocoin/cloud-billing/datastore"
+	"github.com/videocoin/cloud-billing/manager"
 	"github.com/videocoin/cloud-pkg/auth"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -20,7 +20,7 @@ type ServerOpts struct {
 	Addr            string
 	AuthTokenSecret string
 	StripeOpts      *StripeOpts
-	DM              *datastore.DataManager
+	DM              *manager.Manager
 	Users           usersv1.UserServiceClient
 	Accounts        accountsv1.AccountServiceClient
 }
@@ -32,7 +32,7 @@ type Server struct {
 	grpc            *grpc.Server
 	listen          net.Listener
 	validator       *requestValidator
-	dm              *datastore.DataManager
+	dm              *manager.Manager
 	accounts        accountsv1.AccountServiceClient
 	users           usersv1.UserServiceClient
 	stripeOpts      *StripeOpts

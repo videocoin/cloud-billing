@@ -1,4 +1,4 @@
-package datastore
+package manager
 
 import (
 	"context"
@@ -6,35 +6,40 @@ import (
 	"github.com/mailru/dbr"
 	"github.com/sirupsen/logrus"
 	"github.com/stripe/stripe-go"
+	"github.com/videocoin/cloud-billing/datastore"
 )
 
-type DataManager struct {
+type Manager struct {
 	logger *logrus.Entry
-	ds     *Datastore
+	ds     *datastore.Datastore
 }
 
-func NewDataManager(logger *logrus.Entry, ds *Datastore) (*DataManager, error) {
-	return &DataManager{
-		logger: logger,
-		ds:     ds,
-	}, nil
+func New(opts ...Option) (*Manager, error) {
+	ds := &Manager{}
+	for _, o := range opts {
+		if err := o(ds); err != nil {
+			return nil, err
+		}
+	}
+
+	return ds, nil
 }
 
-func (m *DataManager) NewContext(ctx context.Context) (context.Context, *dbr.Session, *dbr.Tx, error) {
-	dbLogger := NewDatastoreLogger(m.logger)
-	sess := m.ds.conn.NewSession(dbLogger)
+func (m *Manager) NewContext(ctx context.Context) (context.Context, *dbr.Session, *dbr.Tx, error) {
+	dbLogger := datastore.NewDatastoreLogger(m.logger)
+	sess := m.ds.NewSession(dbLogger)
 	tx, err := sess.Begin()
 	if err != nil {
 		return ctx, nil, nil, err
 	}
 
-	ctx = NewContextWithDbSession(ctx, sess)
-	ctx = NewContextWithDbTx(ctx, tx)
+	ctx = datastore.NewContextWithDbSession(ctx, sess)
+	ctx = datastore.NewContextWithDbTx(ctx, tx)
 
 	return ctx, sess, tx, err
 }
 
-func (m *DataManager) CreateAccount(ctx context.Context, account *Account) error {
+func (m *Manager) CreateAccount(ctx context.Context, account *datastore.Account) error {
 	ctx, _, tx, err := m.NewContext(ctx)
 	if err != nil {
 		return failedTo("create account", err)
@@ -49,7 +54,7 @@ func (m *DataManager) CreateAccount(ctx context.Context, account *Account) error
 	return tx.Commit()
 }
 
-func (m *DataManager) GetAccountByUserID(ctx context.Context, userID string) (*Account, error) {
+func (m *Manager) GetAccountByUserID(ctx context.Context, userID string) (*datastore.Account, error) {
 	ctx, _, tx, err := m.NewContext(ctx)
 	if err != nil {
 		return nil, failedTo("get account by user id", err)
@@ -69,7 +74,7 @@ func (m *DataManager) GetAccountByUserID(ctx context.Context, userID string) (*A
 	return account, nil
 }
 
-func (m *DataManager) CreateTransaction(ctx context.Context, transaction *Transaction) error {
+func (m *Manager) CreateTransaction(ctx context.Context, transaction *datastore.Transaction) error {
 	ctx, _, tx, err := m.NewContext(ctx)
 	if err != nil {
 		return failedTo("create transaction", err)
@@ -84,7 +89,7 @@ func (m *DataManager) CreateTransaction(ctx context.Context, transaction *Transa
 	return tx.Commit()
 }
 
-func (m *DataManager) UpdateTransactionPaymentIntent(ctx context.Context, transaction *Transaction, paymentIntent *stripe.PaymentIntent) error {
+func (m *Manager) UpdateTransactionPaymentIntent(ctx context.Context, transaction *datastore.Transaction, paymentIntent *stripe.PaymentIntent) error {
 	ctx, _, tx, err := m.NewContext(ctx)
 	if err != nil {
 		return failedTo("update transaction payment intent", err)
@@ -99,7 +104,7 @@ func (m *DataManager) UpdateTransactionPaymentIntent(ctx context.Context, transa
 	return tx.Commit()
 }
 
-func (m *DataManager) GetTransactionByCheckoutSessionID(ctx context.Context, checkoutSessionID string) (*Transaction, error) {
+func (m *Manager) GetTransactionByCheckoutSessionID(ctx context.Context, checkoutSessionID string) (*datastore.Transaction, error) {
 	ctx, _, tx, err := m.NewContext(ctx)
 	if err != nil {
 		return nil, failedTo("get transaction by checkout session id", err)

@@ -43,3 +43,7 @@ func NewDatastore(uri string) (*Datastore, error) {
 
 	return ds, nil
 }
+
+func (ds *Datastore) NewSession(log dbr.EventReceiver) *dbr.Session {
+	return ds.conn.NewSession(log)
+}

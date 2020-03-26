@@ -6,7 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	accountsv1 "github.com/videocoin/cloud-api/accounts/v1"
 	usersv1 "github.com/videocoin/cloud-api/users/v1"
-	"github.com/videocoin/cloud-billing/datastore"
+	"github.com/videocoin/cloud-billing/manager"
 	"github.com/videocoin/cloud-pkg/grpcutil"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
@@ -44,7 +44,7 @@ func WithAuthTokenSecret(secret string) Option {
 	}
 }
 
-func WithDataManager(dm *datastore.DataManager) Option {
+func WithDataManager(dm *manager.Manager) Option {
 	return func(s *Server) error {
 		s.dm = dm
 		return nil

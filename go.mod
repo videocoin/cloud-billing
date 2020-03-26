@@ -16,10 +16,12 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mailru/dbr v3.0.0+incompatible
+	github.com/mailru/go-clickhouse v1.3.0 // indirect
 	github.com/sirupsen/logrus v1.4.2
 	github.com/stripe/stripe-go v70.7.0+incompatible
 	github.com/videocoin/cloud-api v0.0.17
 	github.com/videocoin/cloud-pkg v0.0.5
 	google.golang.org/grpc v1.28.0
+	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0 // indirect
 	gopkg.in/go-playground/validator.v9 v9.31.0
 )

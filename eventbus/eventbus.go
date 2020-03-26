@@ -2,7 +2,7 @@ package eventbus
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/videocoin/cloud-billing/datastore"
+	"github.com/videocoin/cloud-billing/manager"
 	"github.com/videocoin/cloud-pkg/mqmux"
 )
 
@@ -10,13 +10,13 @@ type Config struct {
 	Logger *logrus.Entry
 	URI    string
 	Name   string
-	DM     *datastore.DataManager
+	DM     *manager.Manager
 }
 
 type EventBus struct {
 	logger *logrus.Entry
 	mq     *mqmux.WorkerMux
-	dm     *datastore.DataManager
+	dm     *manager.Manager
 }
 
 func New(c *Config) (*EventBus, error) {

@@ -4,6 +4,7 @@ import (
 	"github.com/stripe/stripe-go"
 	"github.com/videocoin/cloud-billing/datastore"
 	"github.com/videocoin/cloud-billing/eventbus"
+	"github.com/videocoin/cloud-billing/manager"
 	"github.com/videocoin/cloud-billing/rpc"
 )
 
@@ -19,7 +20,10 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
-	dm, err := datastore.NewDataManager(cfg.Logger.WithField("system", "datamanager"), ds)
+	dm, err := manager.New(
+		manager.WithLogger(cfg.Logger.WithField("system", "datamanager")),
+		manager.WithDatastore(ds),
+	)
 	if err != nil {
 		return nil, err
 	}
