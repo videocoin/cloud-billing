@@ -6,32 +6,32 @@ import (
 	"github.com/videocoin/cloud-pkg/mqmux"
 )
 
-type Config struct {
-	Logger *logrus.Entry
-	URI    string
-	Name   string
-	DM     *manager.Manager
-}
-
 type EventBus struct {
 	logger *logrus.Entry
+	uri    string
+	name   string
 	mq     *mqmux.WorkerMux
 	dm     *manager.Manager
 }
 
-func New(c *Config) (*EventBus, error) {
-	mq, err := mqmux.NewWorkerMux(c.URI, c.Name)
+func NewEventBus(uri string, opts ...Option) (*EventBus, error) {
+	eb := &EventBus{
+		uri: uri,
+	}
+	for _, o := range opts {
+		if err := o(eb); err != nil {
+			return nil, err
+		}
+	}
+
+	mq, err := mqmux.NewWorkerMux(eb.uri, eb.name)
 	if err != nil {
 		return nil, err
 	}
-	if c.Logger != nil {
-		mq.Logger = c.Logger
-	}
-	return &EventBus{
-		logger: c.Logger,
-		mq:     mq,
-		dm:     c.DM,
-	}, nil
+
+	eb.mq = mq
+
+	return eb, nil
 }
 
 func (e *EventBus) Start() error {

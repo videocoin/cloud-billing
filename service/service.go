@@ -44,13 +44,12 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
-	ebConfig := &eventbus.Config{
-		URI:    cfg.MQURI,
-		Name:   cfg.Name,
-		Logger: cfg.Logger.WithField("system", "eventbus"),
-		DM:     dm,
-	}
-	eb, err := eventbus.New(ebConfig)
+	eb, err := eventbus.NewEventBus(
+		cfg.MQURI,
+		eventbus.WithName(cfg.Name),
+		eventbus.WithLogger(cfg.Logger.WithField("system", "eventbus")),
+		eventbus.WithDataManager(dm),
+	)
 	if err != nil {
 		return nil, err
 	}
