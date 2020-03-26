@@ -11,10 +11,7 @@ import (
 	usersv1 "github.com/videocoin/cloud-api/users/v1"
 	"github.com/videocoin/cloud-billing/datastore"
 	"github.com/videocoin/cloud-pkg/auth"
-	"github.com/videocoin/cloud-pkg/grpcutil"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/health"
-	healthv1 "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -34,46 +31,27 @@ type Server struct {
 	authTokenSecret string
 	grpc            *grpc.Server
 	listen          net.Listener
-	v               *requestValidator
+	validator       *requestValidator
 	dm              *datastore.DataManager
 	accounts        accountsv1.AccountServiceClient
 	users           usersv1.UserServiceClient
 	stripeOpts      *StripeOpts
 }
 
-func NewServer(opts *ServerOpts) (*Server, error) {
-	grpcOpts := grpcutil.DefaultServerOpts(opts.Logger)
-	grpcServer := grpc.NewServer(grpcOpts...)
-
-	healthService := health.NewServer()
-	healthv1.RegisterHealthServer(grpcServer, healthService)
-
-	listen, err := net.Listen("tcp", opts.Addr)
-	if err != nil {
-		return nil, err
+func NewServer(opts ...Option) (*Server, error) {
+	s := &Server{
+		grpc: grpc.NewServer(),
 	}
-	validator, err := newRequestValidator()
-	if err != nil {
-		return nil, err
+	for _, o := range opts {
+		if err := o(s); err != nil {
+			return nil, err
+		}
 	}
 
-	rpcServer := &Server{
-		addr:            opts.Addr,
-		authTokenSecret: opts.AuthTokenSecret,
-		logger:          opts.Logger.WithField("system", "rpc"),
-		v:               validator,
-		grpc:            grpcServer,
-		listen:          listen,
-		accounts:        opts.Accounts,
-		users:           opts.Users,
-		dm:              opts.DM,
-		stripeOpts:      opts.StripeOpts,
-	}
+	v1.RegisterBillingServiceServer(s.grpc, s)
+	reflection.Register(s.grpc)
 
-	v1.RegisterBillingServiceServer(grpcServer, rpcServer)
-	reflection.Register(grpcServer)
-
-	return rpcServer, nil
+	return s, nil
 }
 
 func (s *Server) Start() error {
