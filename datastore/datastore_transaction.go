@@ -27,25 +27,19 @@ func NewTransactionDatastore(conn *dbr.Connection) (*TransactionDatastore, error
 }
 
 func (ds *TransactionDatastore) Create(ctx context.Context, transaction *Transaction) error {
-	var err error
-
-	sess, ok := DbSessionFromContext(ctx)
-	if !ok || sess == nil {
-		sess = ds.conn.NewSession(nil)
-	}
-
 	tx, ok := DbTxFromContext(ctx)
-	if !ok || tx == nil {
-		tx, err = sess.Begin()
+	if !ok {
+		sess := ds.conn.NewSession(nil)
+		tx, err := sess.Begin()
 		if err != nil {
 			return err
 		}
-	}
 
-	defer func() {
-		err = tx.Commit()
-		tx.RollbackUnlessCommitted()
-	}()
+		defer func() {
+			err = tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
+	}
 
 	if transaction.ID == "" {
 		id, err := uuid4.New()
@@ -61,7 +55,7 @@ func (ds *TransactionDatastore) Create(ctx context.Context, transaction *Transac
 	}
 
 	cols := []string{"id", "account_id", "created_at", "type", "checkout_session_id", "payment_intent_id", "payment_status", "amount"}
-	_, err = tx.InsertInto(ds.table).Columns(cols...).Record(transaction).Exec()
+	_, err := tx.InsertInto(ds.table).Columns(cols...).Record(transaction).Exec()
 	if err != nil {
 		return err
 	}
@@ -70,30 +64,24 @@ func (ds *TransactionDatastore) Create(ctx context.Context, transaction *Transac
 }
 
 func (ds *TransactionDatastore) UpdatePaymentIntent(ctx context.Context, transaction *Transaction, paymentIntent *stripe.PaymentIntent) error {
-	var err error
-
-	sess, ok := DbSessionFromContext(ctx)
-	if !ok || sess == nil {
-		sess = ds.conn.NewSession(nil)
-	}
-
 	tx, ok := DbTxFromContext(ctx)
-	if !ok || tx == nil {
-		tx, err = sess.Begin()
+	if !ok {
+		sess := ds.conn.NewSession(nil)
+		tx, err := sess.Begin()
 		if err != nil {
 			return err
 		}
-	}
 
-	defer func() {
-		err = tx.Commit()
-		tx.RollbackUnlessCommitted()
-	}()
+		defer func() {
+			err = tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
+	}
 
 	transaction.PaymentIntentID = paymentIntent.ID
 	transaction.PaymentStatus = paymentIntent.Status
 
-	_, err = tx.
+	_, err := tx.
 		Update(ds.table).
 		Where("id = ?", transaction.ID).
 		Set("payment_intent_id", transaction.PaymentIntentID).
@@ -104,28 +92,22 @@ func (ds *TransactionDatastore) UpdatePaymentIntent(ctx context.Context, transac
 }
 
 func (ds *TransactionDatastore) GetByCheckoutSessionID(ctx context.Context, checkoutSessionID string) (*Transaction, error) {
-	var err error
-
-	sess, ok := DbSessionFromContext(ctx)
-	if !ok || sess == nil {
-		sess = ds.conn.NewSession(nil)
-	}
-
 	tx, ok := DbTxFromContext(ctx)
-	if !ok || tx == nil {
-		tx, err = sess.Begin()
+	if !ok {
+		sess := ds.conn.NewSession(nil)
+		tx, err := sess.Begin()
 		if err != nil {
 			return nil, err
 		}
+
+		defer func() {
+			err = tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
 	}
 
-	defer func() {
-		err = tx.Commit()
-		tx.RollbackUnlessCommitted()
-	}()
-
 	transaction := new(Transaction)
-	err = tx.Select("*").From(ds.table).Where("checkout_session_id = ?", checkoutSessionID).LoadStruct(transaction)
+	err := tx.Select("*").From(ds.table).Where("checkout_session_id = ?", checkoutSessionID).LoadStruct(transaction)
 	if err != nil {
 		if err == dbr.ErrNotFound {
 			return nil, ErrTxNotFound

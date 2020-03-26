@@ -26,25 +26,19 @@ func NewAccountDatastore(conn *dbr.Connection) (*AccountDatastore, error) {
 }
 
 func (ds *AccountDatastore) Create(ctx context.Context, account *Account) error {
-	var err error
-
-	sess, ok := DbSessionFromContext(ctx)
-	if !ok || sess == nil {
-		sess = ds.conn.NewSession(nil)
-	}
-
 	tx, ok := DbTxFromContext(ctx)
-	if !ok || tx == nil {
-		tx, err = sess.Begin()
+	if !ok {
+		sess := ds.conn.NewSession(nil)
+		tx, err := sess.Begin()
 		if err != nil {
 			return err
 		}
-	}
 
-	defer func() {
-		err = tx.Commit()
-		tx.RollbackUnlessCommitted()
-	}()
+		defer func() {
+			err = tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
+	}
 
 	if account.ID == "" {
 		id, err := uuid4.New()
@@ -60,7 +54,7 @@ func (ds *AccountDatastore) Create(ctx context.Context, account *Account) error 
 	}
 
 	cols := []string{"id", "user_id", "created_at", "updated_at", "balance"}
-	_, err = tx.InsertInto(ds.table).Columns(cols...).Record(account).Exec()
+	_, err := tx.InsertInto(ds.table).Columns(cols...).Record(account).Exec()
 	if err != nil {
 		return err
 	}
@@ -69,28 +63,22 @@ func (ds *AccountDatastore) Create(ctx context.Context, account *Account) error 
 }
 
 func (ds *AccountDatastore) GetByUserID(ctx context.Context, userID string) (*Account, error) {
-	var err error
-
-	sess, ok := DbSessionFromContext(ctx)
-	if !ok || sess == nil {
-		sess = ds.conn.NewSession(nil)
-	}
-
 	tx, ok := DbTxFromContext(ctx)
-	if !ok || tx == nil {
-		tx, err = sess.Begin()
+	if !ok {
+		sess := ds.conn.NewSession(nil)
+		tx, err := sess.Begin()
 		if err != nil {
 			return nil, err
 		}
+
+		defer func() {
+			err = tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
 	}
 
-	defer func() {
-		err = tx.Commit()
-		tx.RollbackUnlessCommitted()
-	}()
-
 	account := new(Account)
-	err = tx.Select("*").From(ds.table).Where("user_id = ?", userID).LoadStruct(account)
+	err := tx.Select("*").From(ds.table).Where("user_id = ?", userID).LoadStruct(account)
 	if err != nil {
 		if err == dbr.ErrNotFound {
 			return nil, ErrAccountNotFound
