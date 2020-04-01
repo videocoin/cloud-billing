@@ -54,7 +54,7 @@ func (ds *AccountDatastore) Create(ctx context.Context, account *Account) error 
 		account.CreatedAt = time.Now()
 	}
 
-	cols := []string{"id", "user_id", "created_at", "updated_at", "balance"}
+	cols := []string{"id", "user_id", "email", "created_at", "updated_at", "balance", "customer_id"}
 	_, err := tx.InsertInto(ds.table).Columns(cols...).Record(account).Exec()
 	if err != nil {
 		return err
@@ -88,4 +88,30 @@ func (ds *AccountDatastore) GetByUserID(ctx context.Context, userID string) (*Ac
 	}
 
 	return account, nil
+}
+
+func (ds *AccountDatastore) UpdateCustomer(ctx context.Context, account *Account, customerID string) error {
+	tx, ok := dbrutil.DbTxFromContext(ctx)
+	if !ok {
+		sess := ds.conn.NewSession(nil)
+		tx, err := sess.Begin()
+		if err != nil {
+			return err
+		}
+
+		defer func() {
+			err = tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
+	}
+
+	account.CustomerID = dbr.NewNullString(customerID)
+
+	_, err := tx.
+		Update(ds.table).
+		Where("id = ?", account.ID).
+		Set("customer_id", account.CustomerID).
+		Exec()
+
+	return err
 }

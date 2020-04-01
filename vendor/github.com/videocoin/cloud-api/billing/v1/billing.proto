@@ -11,11 +11,12 @@ option (gogoproto.sizer_all) = true;
 option (gogoproto.goproto_registration) = true;
 option (gogoproto.messagename_all) = true;
 
-enum TransactionType {
+enum TransactionStatus {
     option (gogoproto.goproto_enum_prefix) = false;
-    option (gogoproto.enum_customname) = "TransactionType";
+    option (gogoproto.enum_customname) = "TransactionStatus";
 
-    UNKNOWN = 0 [(gogoproto.enumvalue_customname) = "TransactionTypeUnknown"];
-    DEBIT = 1 [(gogoproto.enumvalue_customname) = "TransactionTypeDebit"];
-    CREDIT = 2 [(gogoproto.enumvalue_customname) = "TransactionTypeCredit"];
+    PENDING = 0 [(gogoproto.enumvalue_customname) = "TransactionStatusPending"];
+    PROCESSING = 1 [(gogoproto.enumvalue_customname) = "TransactionStatusProcesing"];
+    SUCCESS = 2 [(gogoproto.enumvalue_customname) = "TransactionStatusSuccess"];
+    FAILED = 3 [(gogoproto.enumvalue_customname) = "TransactionStatusFailed"];
 }

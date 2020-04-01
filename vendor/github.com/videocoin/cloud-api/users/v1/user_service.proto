@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package cloud.api.users.v1;
 
-import "github.com/videocoin/cloud-api/transfers/v1/transfer.proto";
-
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-swagger/options/annotations.proto";
@@ -54,18 +52,6 @@ service UserService {
 
     rpc GetById(UserRequest) returns (UserProfile) {}
 
-    rpc Key(UserRequest) returns (KeyResponse) {
-        option (google.api.http) = {
-            get: "/api/v1/user/{id}/key"
-        };
-    }
-
-    rpc Keys(google.protobuf.Empty) returns (KeysResponse) {
-        option (google.api.http) = {
-            get: "/api/v1/keys"
-        };
-    }
-
     rpc StartRecovery(StartRecoveryUserRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
             post: "/api/v1/recovery/start",
@@ -80,15 +66,17 @@ service UserService {
         };
     }
 
-    rpc Whitelist(google.protobuf.Empty) returns (WhitelistResponse) {
+    rpc StartConfirmation(google.protobuf.Empty) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            get: "/api/v1/whitelist"
+            post: "/api/v1/user/confirm/start",
+            body: "*"
         };
     }
 
-    rpc LookupByAddress(LookupByAddressRequest) returns (google.protobuf.Empty) {
+    rpc Confirm(ConfirmUserRequest) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            get: "/api/v1/address/{address}"
+            post: "/api/v1/user/confirm",
+            body: "*"
         };
     }
 
@@ -112,34 +100,6 @@ service UserService {
     }
 
     rpc GetApiToken(ApiTokenRequest) returns (UserApiTokenResponse) {}
-
-    rpc StartWithdraw(StartWithdrawRequest) returns (WithdrawResponse) {
-        option (google.api.http) = {
-            post: "/api/v1/withdraw/start",
-            body: "*"
-        };
-    }
-
-    rpc Withdraw(WithdrawRequest) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            post: "/api/v1/withdraw",
-            body: "*"
-        };
-    }
-
-    rpc StartConfirmation(google.protobuf.Empty) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            post: "/api/v1/user/confirm/start",
-            body: "*"
-        };
-    }
-
-    rpc Confirm(ConfirmUserRequest) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            post: "/api/v1/user/confirm",
-            body: "*"
-        };
-    }
 }
 
 message CreateUserRequest {
@@ -211,24 +171,6 @@ message ConfirmUserRequest {
     ];
 }
 
-message WhitelistResponse {
-    repeated string items = 1;
-}
-
-message LookupByAddressRequest {
-    string address = 1 [
-        (gogoproto.moretags) = "validate:\"required\""
-    ];
-}
-
-message KeyResponse {
-    string key = 1;
-}
-
-message KeysResponse {
-    repeated KeyResponse items = 1;
-}
-
 message UserApiTokenRequest {
     string id = 1;
     string name = 2;
@@ -251,24 +193,4 @@ message UserApiTokenResponse {
 
 message UserApiListResponse {
     repeated UserApiTokenResponse items = 1;
-}
-
-message StartWithdrawRequest {
-    string address = 1 [
-        (gogoproto.moretags) = "validate:\"required\""
-    ];
-    string amount = 2;
-}
-
-message WithdrawRequest {
-    string transfer_id = 1 [
-        (gogoproto.moretags) = "validate:\"required\""
-    ];
-    string pin = 2 [
-        (gogoproto.moretags) = "validate:\"required,len=6\""
-    ];
-}
-
-message WithdrawResponse {
-    string transfer_id = 1;
 }

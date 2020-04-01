@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/mailru/dbr"
-	"github.com/stripe/stripe-go"
 	"github.com/videocoin/cloud-pkg/dbrutil"
 	"github.com/videocoin/cloud-pkg/uuid4"
 )
@@ -55,66 +54,14 @@ func (ds *TransactionDatastore) Create(ctx context.Context, transaction *Transac
 		transaction.CreatedAt = time.Now()
 	}
 
-	cols := []string{"id", "account_id", "created_at", "type", "checkout_session_id", "payment_intent_id", "payment_status", "amount"}
+	cols := []string{
+		"id", "from", "to", "created_at", "status", "amount",
+		"payment_intent_secret", "payment_intent_id", "payment_status",
+		"stream_id", "profile_id"}
 	_, err := tx.InsertInto(ds.table).Columns(cols...).Record(transaction).Exec()
 	if err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func (ds *TransactionDatastore) UpdatePaymentIntent(ctx context.Context, transaction *Transaction, paymentIntent *stripe.PaymentIntent) error {
-	tx, ok := dbrutil.DbTxFromContext(ctx)
-	if !ok {
-		sess := ds.conn.NewSession(nil)
-		tx, err := sess.Begin()
-		if err != nil {
-			return err
-		}
-
-		defer func() {
-			err = tx.Commit()
-			tx.RollbackUnlessCommitted()
-		}()
-	}
-
-	transaction.PaymentIntentID = paymentIntent.ID
-	transaction.PaymentStatus = paymentIntent.Status
-
-	_, err := tx.
-		Update(ds.table).
-		Where("id = ?", transaction.ID).
-		Set("payment_intent_id", transaction.PaymentIntentID).
-		Set("payment_status", transaction.PaymentStatus).
-		Exec()
-
-	return err
-}
-
-func (ds *TransactionDatastore) GetByCheckoutSessionID(ctx context.Context, checkoutSessionID string) (*Transaction, error) {
-	tx, ok := dbrutil.DbTxFromContext(ctx)
-	if !ok {
-		sess := ds.conn.NewSession(nil)
-		tx, err := sess.Begin()
-		if err != nil {
-			return nil, err
-		}
-
-		defer func() {
-			err = tx.Commit()
-			tx.RollbackUnlessCommitted()
-		}()
-	}
-
-	transaction := new(Transaction)
-	err := tx.Select("*").From(ds.table).Where("checkout_session_id = ?", checkoutSessionID).LoadStruct(transaction)
-	if err != nil {
-		if err == dbr.ErrNotFound {
-			return nil, ErrTxNotFound
-		}
-		return nil, err
-	}
-
-	return transaction, nil
 }

@@ -51,13 +51,6 @@ func WithDataManager(dm *manager.Manager) Option {
 	}
 }
 
-func WithStripeOpts(opts *StripeOpts) Option {
-	return func(s *Server) error {
-		s.stripeOpts = opts
-		return nil
-	}
-}
-
 func WithUsersServiceClient(addr string) Option {
 	return func(s *Server) error {
 		conn, err := grpcutil.Connect(addr, s.logger.WithField("system", "users"))

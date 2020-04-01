@@ -9,7 +9,6 @@ import (
 	_ "github.com/gogo/googleapis/google/api"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
-	types "github.com/gogo/protobuf/types"
 	golang_proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -83,7 +82,7 @@ func (*MakePaymentRequest) XXX_MessageName() string {
 }
 
 type MakePaymentResponse struct {
-	SessionId            string   `protobuf:"bytes,2,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	ClientSecret         string   `protobuf:"bytes,1,opt,name=client_secret,json=clientSecret,proto3" json:"client_secret,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -122,9 +121,9 @@ func (m *MakePaymentResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MakePaymentResponse proto.InternalMessageInfo
 
-func (m *MakePaymentResponse) GetSessionId() string {
+func (m *MakePaymentResponse) GetClientSecret() string {
 	if m != nil {
-		return m.SessionId
+		return m.ClientSecret
 	}
 	return ""
 }
@@ -132,207 +131,11 @@ func (m *MakePaymentResponse) GetSessionId() string {
 func (*MakePaymentResponse) XXX_MessageName() string {
 	return "cloud.api.billing.v1.MakePaymentResponse"
 }
-
-type TransactionRequest struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *TransactionRequest) Reset()         { *m = TransactionRequest{} }
-func (m *TransactionRequest) String() string { return proto.CompactTextString(m) }
-func (*TransactionRequest) ProtoMessage()    {}
-func (*TransactionRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e1bde738a35a0fff, []int{2}
-}
-func (m *TransactionRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *TransactionRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_TransactionRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *TransactionRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TransactionRequest.Merge(m, src)
-}
-func (m *TransactionRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *TransactionRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_TransactionRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_TransactionRequest proto.InternalMessageInfo
-
-func (*TransactionRequest) XXX_MessageName() string {
-	return "cloud.api.billing.v1.TransactionRequest"
-}
-
-type TransactionResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *TransactionResponse) Reset()         { *m = TransactionResponse{} }
-func (m *TransactionResponse) String() string { return proto.CompactTextString(m) }
-func (*TransactionResponse) ProtoMessage()    {}
-func (*TransactionResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e1bde738a35a0fff, []int{3}
-}
-func (m *TransactionResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *TransactionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_TransactionResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *TransactionResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TransactionResponse.Merge(m, src)
-}
-func (m *TransactionResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *TransactionResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_TransactionResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_TransactionResponse proto.InternalMessageInfo
-
-func (*TransactionResponse) XXX_MessageName() string {
-	return "cloud.api.billing.v1.TransactionResponse"
-}
-
-type TransactionListResponse struct {
-	Items                []*TransactionResponse `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}               `json:"-"`
-	XXX_unrecognized     []byte                 `json:"-"`
-	XXX_sizecache        int32                  `json:"-"`
-}
-
-func (m *TransactionListResponse) Reset()         { *m = TransactionListResponse{} }
-func (m *TransactionListResponse) String() string { return proto.CompactTextString(m) }
-func (*TransactionListResponse) ProtoMessage()    {}
-func (*TransactionListResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e1bde738a35a0fff, []int{4}
-}
-func (m *TransactionListResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *TransactionListResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_TransactionListResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *TransactionListResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_TransactionListResponse.Merge(m, src)
-}
-func (m *TransactionListResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *TransactionListResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_TransactionListResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_TransactionListResponse proto.InternalMessageInfo
-
-func (m *TransactionListResponse) GetItems() []*TransactionResponse {
-	if m != nil {
-		return m.Items
-	}
-	return nil
-}
-
-func (*TransactionListResponse) XXX_MessageName() string {
-	return "cloud.api.billing.v1.TransactionListResponse"
-}
-
-type StripePaymentRequest struct {
-	SessionId            string   `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *StripePaymentRequest) Reset()         { *m = StripePaymentRequest{} }
-func (m *StripePaymentRequest) String() string { return proto.CompactTextString(m) }
-func (*StripePaymentRequest) ProtoMessage()    {}
-func (*StripePaymentRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_e1bde738a35a0fff, []int{5}
-}
-func (m *StripePaymentRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *StripePaymentRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_StripePaymentRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *StripePaymentRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_StripePaymentRequest.Merge(m, src)
-}
-func (m *StripePaymentRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *StripePaymentRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_StripePaymentRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_StripePaymentRequest proto.InternalMessageInfo
-
-func (m *StripePaymentRequest) GetSessionId() string {
-	if m != nil {
-		return m.SessionId
-	}
-	return ""
-}
-
-func (*StripePaymentRequest) XXX_MessageName() string {
-	return "cloud.api.billing.v1.StripePaymentRequest"
-}
 func init() {
 	proto.RegisterType((*MakePaymentRequest)(nil), "cloud.api.billing.v1.MakePaymentRequest")
 	golang_proto.RegisterType((*MakePaymentRequest)(nil), "cloud.api.billing.v1.MakePaymentRequest")
 	proto.RegisterType((*MakePaymentResponse)(nil), "cloud.api.billing.v1.MakePaymentResponse")
 	golang_proto.RegisterType((*MakePaymentResponse)(nil), "cloud.api.billing.v1.MakePaymentResponse")
-	proto.RegisterType((*TransactionRequest)(nil), "cloud.api.billing.v1.TransactionRequest")
-	golang_proto.RegisterType((*TransactionRequest)(nil), "cloud.api.billing.v1.TransactionRequest")
-	proto.RegisterType((*TransactionResponse)(nil), "cloud.api.billing.v1.TransactionResponse")
-	golang_proto.RegisterType((*TransactionResponse)(nil), "cloud.api.billing.v1.TransactionResponse")
-	proto.RegisterType((*TransactionListResponse)(nil), "cloud.api.billing.v1.TransactionListResponse")
-	golang_proto.RegisterType((*TransactionListResponse)(nil), "cloud.api.billing.v1.TransactionListResponse")
-	proto.RegisterType((*StripePaymentRequest)(nil), "cloud.api.billing.v1.StripePaymentRequest")
-	golang_proto.RegisterType((*StripePaymentRequest)(nil), "cloud.api.billing.v1.StripePaymentRequest")
 }
 
 func init() { proto.RegisterFile("billing/v1/billing_service.proto", fileDescriptor_e1bde738a35a0fff) }
@@ -341,38 +144,26 @@ func init() {
 }
 
 var fileDescriptor_e1bde738a35a0fff = []byte{
-	// 490 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xc1, 0x6a, 0x14, 0x31,
-	0x18, 0xc7, 0xc9, 0x56, 0x0b, 0x4d, 0x41, 0x21, 0xbb, 0xad, 0xc3, 0xd8, 0x8e, 0x4b, 0x50, 0xd8,
-	0x56, 0x37, 0xc3, 0xb6, 0x7a, 0xf1, 0x22, 0xb4, 0x88, 0x08, 0x0a, 0xb2, 0xeb, 0xa9, 0x97, 0x92,
-	0xc9, 0xc6, 0x31, 0x74, 0x26, 0x19, 0x37, 0x99, 0x85, 0x45, 0xbc, 0xf4, 0x09, 0x0a, 0xbe, 0x85,
-	0x4f, 0xe1, 0xb1, 0x47, 0xc1, 0x17, 0x90, 0xad, 0x0f, 0x22, 0x4d, 0x22, 0x3b, 0x3b, 0x9d, 0x45,
-	0x6f, 0x93, 0x7c, 0xff, 0xf9, 0x7e, 0xff, 0xfc, 0xbf, 0x0f, 0x76, 0x13, 0x91, 0x65, 0x42, 0xa6,
-	0xf1, 0x74, 0x10, 0xfb, 0xcf, 0x53, 0xcd, 0x27, 0x53, 0xc1, 0x38, 0x29, 0x26, 0xca, 0x28, 0xd4,
-	0x61, 0x99, 0x2a, 0xc7, 0x84, 0x16, 0x82, 0x78, 0x01, 0x99, 0x0e, 0xc2, 0x7e, 0x2a, 0xcc, 0xc7,
-	0x32, 0x21, 0x4c, 0xe5, 0x71, 0xaa, 0x52, 0x15, 0x5b, 0x71, 0x52, 0x7e, 0xb0, 0x27, 0x7b, 0xb0,
-	0x5f, 0xae, 0x49, 0x78, 0x3f, 0x55, 0x2a, 0xcd, 0xf8, 0x42, 0xc5, 0xf3, 0xc2, 0xcc, 0x7c, 0x71,
-	0xc7, 0x17, 0x69, 0x21, 0x62, 0x2a, 0xa5, 0x32, 0xd4, 0x08, 0x25, 0xb5, 0xab, 0xe2, 0x27, 0x10,
-	0xbd, 0xa5, 0x67, 0xfc, 0x1d, 0x9d, 0xe5, 0x5c, 0x9a, 0x21, 0xff, 0x54, 0x72, 0x6d, 0xd0, 0x36,
-	0x5c, 0xa7, 0xb9, 0x2a, 0xa5, 0x09, 0x40, 0x17, 0xf4, 0xd6, 0x86, 0xfe, 0x84, 0x9f, 0xc2, 0xf6,
-	0x92, 0x5a, 0x17, 0x4a, 0x6a, 0x8e, 0x76, 0x21, 0xd4, 0x5c, 0x6b, 0xa1, 0xe4, 0xa9, 0x18, 0x07,
-	0xad, 0x2e, 0xe8, 0x6d, 0x0c, 0x37, 0xfc, 0xcd, 0xeb, 0x31, 0xee, 0x40, 0xf4, 0x7e, 0x42, 0xa5,
-	0xa6, 0xec, 0x9a, 0xec, 0x19, 0x78, 0x0b, 0xb6, 0x97, 0x6e, 0x5d, 0x2f, 0x7c, 0x02, 0xef, 0x55,
-	0xae, 0xdf, 0x08, 0xbd, 0xc0, 0xbc, 0x80, 0xb7, 0x85, 0xe1, 0xb9, 0x0e, 0x40, 0x77, 0xad, 0xb7,
-	0x79, 0xb0, 0x47, 0x9a, 0xb2, 0x23, 0x0d, 0x4d, 0x87, 0xee, 0x3f, 0xfc, 0x0c, 0x76, 0x46, 0x66,
-	0x22, 0x8a, 0xfa, 0x73, 0x97, 0xfd, 0x83, 0x9a, 0xff, 0x83, 0x6f, 0xb7, 0xe0, 0x9d, 0x23, 0x07,
-	0x18, 0xb9, 0xe1, 0xa1, 0x73, 0x00, 0x37, 0x2b, 0x49, 0xa0, 0x5e, 0xb3, 0x97, 0x9b, 0xd1, 0x86,
-	0x7b, 0xff, 0xa1, 0xf4, 0x51, 0x44, 0xe7, 0x3f, 0x7f, 0x7f, 0x6d, 0x05, 0xb8, 0x6d, 0x67, 0xb7,
-	0x58, 0xa1, 0xb8, 0xa0, 0xb3, 0xe7, 0x60, 0x1f, 0x5d, 0x00, 0x78, 0xf7, 0x15, 0x37, 0x95, 0x07,
-	0xeb, 0x55, 0x46, 0x6e, 0xe6, 0x1f, 0xf6, 0xff, 0xa9, 0xac, 0x86, 0x8f, 0x1f, 0x5a, 0x33, 0x11,
-	0xda, 0xa9, 0x9b, 0x31, 0x55, 0xfc, 0x05, 0x80, 0x5b, 0xa3, 0x92, 0x31, 0xae, 0xb5, 0x4b, 0xfa,
-	0x98, 0x66, 0x59, 0x42, 0xd9, 0x19, 0xda, 0x6f, 0xc6, 0x35, 0xcd, 0x23, 0xdc, 0x26, 0x6e, 0x67,
-	0xc9, 0xdf, 0x85, 0x26, 0x2f, 0xaf, 0x17, 0x1a, 0x1f, 0x5a, 0x0f, 0x7d, 0xf4, 0xb8, 0xee, 0x41,
-	0xdb, 0x2e, 0xf1, 0xe7, 0xc5, 0x14, 0xbf, 0xc4, 0xda, 0xd9, 0x40, 0x39, 0xec, 0x1c, 0x53, 0xc9,
-	0x78, 0x56, 0x33, 0xb4, 0x02, 0xb2, 0x12, 0xfe, 0xc8, 0xc2, 0x1f, 0xa0, 0xdd, 0x15, 0x70, 0x66,
-	0x21, 0x47, 0xc1, 0xe5, 0x3c, 0x02, 0x3f, 0xe6, 0x11, 0xf8, 0x35, 0x8f, 0xc0, 0xf7, 0xab, 0x08,
-	0x5c, 0x5e, 0x45, 0xe0, 0xa4, 0x35, 0x1d, 0x24, 0xeb, 0xb6, 0xe1, 0xe1, 0x9f, 0x00, 0x00, 0x00,
-	0xff, 0xff, 0x78, 0xf4, 0x0b, 0x3f, 0x15, 0x04, 0x00, 0x00,
+	// 292 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x90, 0xcd, 0x4a, 0x03, 0x31,
+	0x14, 0x85, 0x49, 0x85, 0x82, 0xf1, 0x67, 0x91, 0x8a, 0x94, 0x22, 0xa1, 0x8c, 0x9b, 0x2a, 0x9a,
+	0x30, 0xba, 0xeb, 0xb2, 0x7b, 0x41, 0xa6, 0x3b, 0x37, 0x25, 0x33, 0xc6, 0x18, 0x9c, 0xc9, 0x1d,
+	0x27, 0x99, 0x81, 0x6e, 0xfb, 0x0a, 0xe2, 0xfb, 0xb8, 0xec, 0x52, 0xf0, 0x05, 0x64, 0xea, 0x83,
+	0x08, 0xc9, 0x80, 0x8a, 0x2e, 0xdc, 0xdd, 0x73, 0xf3, 0xe5, 0x72, 0xce, 0xc1, 0xe3, 0x54, 0xe7,
+	0xb9, 0x36, 0x8a, 0x37, 0x31, 0xef, 0xc6, 0x85, 0x95, 0x55, 0xa3, 0x33, 0xc9, 0xca, 0x0a, 0x1c,
+	0x90, 0x83, 0x2c, 0x87, 0xfa, 0x96, 0x89, 0x52, 0xb3, 0x0e, 0x60, 0x4d, 0x3c, 0x3a, 0x57, 0xda,
+	0xdd, 0xd7, 0x29, 0xcb, 0xa0, 0xe0, 0x0a, 0x14, 0x70, 0x0f, 0xa7, 0xf5, 0x9d, 0x57, 0x5e, 0xf8,
+	0x29, 0x1c, 0x19, 0x1d, 0x29, 0x00, 0x95, 0x4b, 0x2e, 0x4a, 0xcd, 0x85, 0x31, 0xe0, 0x84, 0xd3,
+	0x60, 0x6c, 0x78, 0x8d, 0xce, 0x30, 0xb9, 0x12, 0x0f, 0xf2, 0x5a, 0x2c, 0x0b, 0x69, 0x5c, 0x22,
+	0x1f, 0x6b, 0x69, 0x1d, 0x39, 0xc4, 0x7d, 0x51, 0x40, 0x6d, 0xdc, 0x10, 0x8d, 0xd1, 0x64, 0x2b,
+	0xe9, 0x54, 0x34, 0xc5, 0x83, 0x1f, 0xb4, 0x2d, 0xc1, 0x58, 0x49, 0x8e, 0xf1, 0x5e, 0x96, 0x6b,
+	0x69, 0xdc, 0xc2, 0xca, 0xac, 0x92, 0xe1, 0xd7, 0x76, 0xb2, 0x1b, 0x96, 0x73, 0xbf, 0xbb, 0x78,
+	0x46, 0x78, 0x7f, 0x16, 0x52, 0xcc, 0x43, 0x4a, 0xb2, 0x42, 0x78, 0xe7, 0xdb, 0x3d, 0x32, 0x61,
+	0x7f, 0x05, 0x66, 0xbf, 0x0d, 0x8e, 0x4e, 0xfe, 0x41, 0x06, 0x73, 0x11, 0x5d, 0xbd, 0x7d, 0x3c,
+	0xf5, 0x86, 0xd1, 0xc0, 0x37, 0xf0, 0xd5, 0x35, 0x2f, 0xc5, 0x72, 0x8a, 0x4e, 0x67, 0xc3, 0x75,
+	0x4b, 0xd1, 0x6b, 0x4b, 0xd1, 0x7b, 0x4b, 0xd1, 0xcb, 0x86, 0xa2, 0xf5, 0x86, 0xa2, 0x9b, 0x5e,
+	0x13, 0xa7, 0x7d, 0x5f, 0xd1, 0xe5, 0x67, 0x00, 0x00, 0x00, 0xff, 0xff, 0x79, 0xe8, 0x89, 0x04,
+	0xa9, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -388,9 +179,6 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type BillingServiceClient interface {
 	MakePayment(ctx context.Context, in *MakePaymentRequest, opts ...grpc.CallOption) (*MakePaymentResponse, error)
-	GetTransactions(ctx context.Context, in *TransactionRequest, opts ...grpc.CallOption) (*TransactionListResponse, error)
-	SuccessStripeCallback(ctx context.Context, in *StripePaymentRequest, opts ...grpc.CallOption) (*types.Empty, error)
-	CancelStripeCallback(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*types.Empty, error)
 }
 
 type billingServiceClient struct {
@@ -410,39 +198,9 @@ func (c *billingServiceClient) MakePayment(ctx context.Context, in *MakePaymentR
 	return out, nil
 }
 
-func (c *billingServiceClient) GetTransactions(ctx context.Context, in *TransactionRequest, opts ...grpc.CallOption) (*TransactionListResponse, error) {
-	out := new(TransactionListResponse)
-	err := c.cc.Invoke(ctx, "/cloud.api.billing.v1.BillingService/GetTransactions", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *billingServiceClient) SuccessStripeCallback(ctx context.Context, in *StripePaymentRequest, opts ...grpc.CallOption) (*types.Empty, error) {
-	out := new(types.Empty)
-	err := c.cc.Invoke(ctx, "/cloud.api.billing.v1.BillingService/SuccessStripeCallback", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *billingServiceClient) CancelStripeCallback(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*types.Empty, error) {
-	out := new(types.Empty)
-	err := c.cc.Invoke(ctx, "/cloud.api.billing.v1.BillingService/CancelStripeCallback", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // BillingServiceServer is the server API for BillingService service.
 type BillingServiceServer interface {
 	MakePayment(context.Context, *MakePaymentRequest) (*MakePaymentResponse, error)
-	GetTransactions(context.Context, *TransactionRequest) (*TransactionListResponse, error)
-	SuccessStripeCallback(context.Context, *StripePaymentRequest) (*types.Empty, error)
-	CancelStripeCallback(context.Context, *types.Empty) (*types.Empty, error)
 }
 
 // UnimplementedBillingServiceServer can be embedded to have forward compatible implementations.
@@ -451,15 +209,6 @@ type UnimplementedBillingServiceServer struct {
 
 func (*UnimplementedBillingServiceServer) MakePayment(ctx context.Context, req *MakePaymentRequest) (*MakePaymentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MakePayment not implemented")
-}
-func (*UnimplementedBillingServiceServer) GetTransactions(ctx context.Context, req *TransactionRequest) (*TransactionListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTransactions not implemented")
-}
-func (*UnimplementedBillingServiceServer) SuccessStripeCallback(ctx context.Context, req *StripePaymentRequest) (*types.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SuccessStripeCallback not implemented")
-}
-func (*UnimplementedBillingServiceServer) CancelStripeCallback(ctx context.Context, req *types.Empty) (*types.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CancelStripeCallback not implemented")
 }
 
 func RegisterBillingServiceServer(s *grpc.Server, srv BillingServiceServer) {
@@ -484,60 +233,6 @@ func _BillingService_MakePayment_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _BillingService_GetTransactions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TransactionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BillingServiceServer).GetTransactions(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/cloud.api.billing.v1.BillingService/GetTransactions",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BillingServiceServer).GetTransactions(ctx, req.(*TransactionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BillingService_SuccessStripeCallback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StripePaymentRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BillingServiceServer).SuccessStripeCallback(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/cloud.api.billing.v1.BillingService/SuccessStripeCallback",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BillingServiceServer).SuccessStripeCallback(ctx, req.(*StripePaymentRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _BillingService_CancelStripeCallback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(types.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BillingServiceServer).CancelStripeCallback(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/cloud.api.billing.v1.BillingService/CancelStripeCallback",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BillingServiceServer).CancelStripeCallback(ctx, req.(*types.Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _BillingService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "cloud.api.billing.v1.BillingService",
 	HandlerType: (*BillingServiceServer)(nil),
@@ -545,18 +240,6 @@ var _BillingService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "MakePayment",
 			Handler:    _BillingService_MakePayment_Handler,
-		},
-		{
-			MethodName: "GetTransactions",
-			Handler:    _BillingService_GetTransactions_Handler,
-		},
-		{
-			MethodName: "SuccessStripeCallback",
-			Handler:    _BillingService_SuccessStripeCallback_Handler,
-		},
-		{
-			MethodName: "CancelStripeCallback",
-			Handler:    _BillingService_CancelStripeCallback_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -619,139 +302,10 @@ func (m *MakePaymentResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if len(m.SessionId) > 0 {
-		i -= len(m.SessionId)
-		copy(dAtA[i:], m.SessionId)
-		i = encodeVarintBillingService(dAtA, i, uint64(len(m.SessionId)))
-		i--
-		dAtA[i] = 0x12
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *TransactionRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *TransactionRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *TransactionRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *TransactionResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *TransactionResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *TransactionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *TransactionListResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *TransactionListResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *TransactionListResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if len(m.Items) > 0 {
-		for iNdEx := len(m.Items) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.Items[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintBillingService(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *StripePaymentRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *StripePaymentRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *StripePaymentRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		i -= len(m.XXX_unrecognized)
-		copy(dAtA[i:], m.XXX_unrecognized)
-	}
-	if len(m.SessionId) > 0 {
-		i -= len(m.SessionId)
-		copy(dAtA[i:], m.SessionId)
-		i = encodeVarintBillingService(dAtA, i, uint64(len(m.SessionId)))
+	if len(m.ClientSecret) > 0 {
+		i -= len(m.ClientSecret)
+		copy(dAtA[i:], m.ClientSecret)
+		i = encodeVarintBillingService(dAtA, i, uint64(len(m.ClientSecret)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -790,65 +344,7 @@ func (m *MakePaymentResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = len(m.SessionId)
-	if l > 0 {
-		n += 1 + l + sovBillingService(uint64(l))
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *TransactionRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *TransactionResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *TransactionListResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.Items) > 0 {
-		for _, e := range m.Items {
-			l = e.Size()
-			n += 1 + l + sovBillingService(uint64(l))
-		}
-	}
-	if m.XXX_unrecognized != nil {
-		n += len(m.XXX_unrecognized)
-	}
-	return n
-}
-
-func (m *StripePaymentRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.SessionId)
+	l = len(m.ClientSecret)
 	if l > 0 {
 		n += 1 + l + sovBillingService(uint64(l))
 	}
@@ -966,9 +462,9 @@ func (m *MakePaymentResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MakePaymentResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
-		case 2:
+		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SessionId", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientSecret", wireType)
 			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
@@ -996,289 +492,7 @@ func (m *MakePaymentResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.SessionId = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipBillingService(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthBillingService
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthBillingService
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *TransactionRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowBillingService
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: TransactionRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: TransactionRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipBillingService(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthBillingService
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthBillingService
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *TransactionResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowBillingService
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: TransactionResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: TransactionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipBillingService(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthBillingService
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthBillingService
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *TransactionListResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowBillingService
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: TransactionListResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: TransactionListResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Items", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowBillingService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthBillingService
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthBillingService
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Items = append(m.Items, &TransactionResponse{})
-			if err := m.Items[len(m.Items)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipBillingService(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthBillingService
-			}
-			if (iNdEx + skippy) < 0 {
-				return ErrInvalidLengthBillingService
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *StripePaymentRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowBillingService
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: StripePaymentRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: StripePaymentRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SessionId", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowBillingService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthBillingService
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthBillingService
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.SessionId = string(dAtA[iNdEx:postIndex])
+			m.ClientSecret = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

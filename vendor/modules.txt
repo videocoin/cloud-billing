@@ -90,7 +90,7 @@ github.com/sirupsen/logrus
 github.com/streadway/amqp
 # github.com/stripe/stripe-go v70.9.0+incompatible
 github.com/stripe/stripe-go
-github.com/stripe/stripe-go/checkout/session
+github.com/stripe/stripe-go/customer
 github.com/stripe/stripe-go/form
 github.com/stripe/stripe-go/paymentintent
 # github.com/uber/jaeger-client-go v2.22.1+incompatible
@@ -118,7 +118,6 @@ github.com/uber/jaeger-lib/metrics
 github.com/videocoin/cloud-api/accounts/v1
 github.com/videocoin/cloud-api/billing/v1
 github.com/videocoin/cloud-api/rpc
-github.com/videocoin/cloud-api/transfers/v1
 github.com/videocoin/cloud-api/users/v1
 # github.com/videocoin/cloud-pkg v0.0.5 => ../cloud-pkg
 github.com/videocoin/cloud-pkg/auth

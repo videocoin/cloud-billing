@@ -25,7 +25,6 @@ type Server struct {
 	dm              *manager.Manager
 	accounts        accountsv1.AccountServiceClient
 	users           usersv1.UserServiceClient
-	stripeOpts      *StripeOpts
 }
 
 func NewServer(opts ...Option) (*Server, error) {

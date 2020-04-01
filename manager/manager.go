@@ -5,7 +5,6 @@ import (
 
 	"github.com/mailru/dbr"
 	"github.com/sirupsen/logrus"
-	"github.com/stripe/stripe-go"
 	"github.com/videocoin/cloud-billing/datastore"
 	"github.com/videocoin/cloud-pkg/dbrutil"
 )
@@ -75,6 +74,21 @@ func (m *Manager) GetAccountByUserID(ctx context.Context, userID string) (*datas
 	return account, nil
 }
 
+func (m *Manager) UpdateAccountCustomer(ctx context.Context, account *datastore.Account, customerID string) error {
+	ctx, _, tx, err := m.NewContext(ctx)
+	if err != nil {
+		return failedTo("update account customer", err)
+	}
+	defer tx.RollbackUnlessCommitted()
+
+	err = m.ds.Accounts.UpdateCustomer(ctx, account, customerID)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
 func (m *Manager) CreateTransaction(ctx context.Context, transaction *datastore.Transaction) error {
 	ctx, _, tx, err := m.NewContext(ctx)
 	if err != nil {
@@ -88,39 +102,4 @@ func (m *Manager) CreateTransaction(ctx context.Context, transaction *datastore.
 	}
 
 	return tx.Commit()
-}
-
-func (m *Manager) UpdateTransactionPaymentIntent(ctx context.Context, transaction *datastore.Transaction, paymentIntent *stripe.PaymentIntent) error {
-	ctx, _, tx, err := m.NewContext(ctx)
-	if err != nil {
-		return failedTo("update transaction payment intent", err)
-	}
-	defer tx.RollbackUnlessCommitted()
-
-	err = m.ds.Transactions.UpdatePaymentIntent(ctx, transaction, paymentIntent)
-	if err != nil {
-		return err
-	}
-
-	return tx.Commit()
-}
-
-func (m *Manager) GetTransactionByCheckoutSessionID(ctx context.Context, checkoutSessionID string) (*datastore.Transaction, error) {
-	ctx, _, tx, err := m.NewContext(ctx)
-	if err != nil {
-		return nil, failedTo("get transaction by checkout session id", err)
-	}
-	defer tx.RollbackUnlessCommitted()
-
-	transaction, err := m.ds.Transactions.GetByCheckoutSessionID(ctx, checkoutSessionID)
-	if err != nil {
-		return nil, err
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return nil, err
-	}
-
-	return transaction, nil
 }

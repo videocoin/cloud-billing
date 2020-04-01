@@ -2,14 +2,16 @@ package rpc
 
 import (
 	"context"
-	"fmt"
 
-	protoempty "github.com/gogo/protobuf/types"
+	"github.com/mailru/dbr"
+
+	"github.com/sirupsen/logrus"
 	"github.com/stripe/stripe-go"
-	checkout "github.com/stripe/stripe-go/checkout/session"
+	"github.com/stripe/stripe-go/customer"
 	"github.com/stripe/stripe-go/paymentintent"
 	v1 "github.com/videocoin/cloud-api/billing/v1"
 	"github.com/videocoin/cloud-api/rpc"
+	usersv1 "github.com/videocoin/cloud-api/users/v1"
 	"github.com/videocoin/cloud-billing/datastore"
 )
 
@@ -19,56 +21,70 @@ func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*
 		return nil, err
 	}
 
+	amount := req.Amount * 100
+
+	logger := s.logger.WithFields(logrus.Fields{
+		"user_id": userID,
+		"amount":  amount,
+	})
+
 	account, err := s.dm.GetAccountByUserID(ctx, userID)
 	if err != nil {
 		if err == datastore.ErrAccountNotFound {
-			account = &datastore.Account{UserID: userID}
+			user, err := s.users.GetById(ctx, &usersv1.UserRequest{Id: userID})
+			if err != nil {
+				logger.Errorf("failed to get user: %s", err)
+				return nil, rpc.ErrRpcInternal
+			}
+
+			account = &datastore.Account{UserID: user.ID, Email: user.Email}
 			createErr := s.dm.CreateAccount(ctx, account)
 			if createErr != nil {
-				s.logger.Errorf("failed to create account: %s", createErr)
+				logger.Errorf("failed to create account: %s", createErr)
 				return nil, rpc.ErrRpcInternal
 			}
 		}
 
-		s.logger.Errorf("failed to get account by user id: %s", err)
+		logger.Errorf("failed to get account by user id: %s", err)
 		return nil, rpc.ErrRpcInternal
 	}
 
-	params := &stripe.CheckoutSessionParams{
-		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
-		LineItems: []*stripe.CheckoutSessionLineItemParams{
-			{
-				Name:        stripe.String("Videcoin Payment"),
-				Description: stripe.String("Videcoin Payment Description"),
-				Amount:      stripe.Int64(req.Amount),
-				Currency:    stripe.String(string(stripe.CurrencyUSD)),
-				Quantity:    stripe.Int64(1),
-			},
-		},
-		SuccessURL: stripe.String(
-			fmt.Sprintf(
-				"%s/api/v1/billing/stripe/{CHECKOUT_SESSION_ID}/success",
-				s.stripeOpts.BaseCallbackURL,
-			)),
-		CancelURL: stripe.String(
-			fmt.Sprintf(
-				"%s/api/v1/billing/stripe/cancel",
-				s.stripeOpts.BaseCallbackURL,
-			)),
+	if account.CustomerID.String == "" {
+		cus, err := customer.New(&stripe.CustomerParams{
+			Email: stripe.String(account.Email),
+		})
+		if err != nil {
+			logger.Errorf("failed to create stripe customer: %s", err)
+			return nil, rpc.ErrRpcInternal
+		}
+
+		err = s.dm.UpdateAccountCustomer(ctx, account, cus.ID)
+		if err != nil {
+			logger.Errorf("failed to update account customer: %s", err)
+			return nil, rpc.ErrRpcInternal
+		}
 	}
 
-	session, err := checkout.New(params)
+	params := &stripe.PaymentIntentParams{
+		Amount:   stripe.Int64(amount),
+		Currency: stripe.String(string(stripe.CurrencyUSD)),
+		Customer: stripe.String(account.CustomerID.String),
+	}
+
+	pi, err := paymentintent.New(params)
 	if err != nil {
-		s.logger.Errorf("failed to stripe session: %s", err)
+		s.logger.Errorf("failed to new payment intent: %s", err)
 		return nil, rpc.ErrRpcInternal
 	}
 
 	transaction := &datastore.Transaction{
-		AccountID:         account.ID,
-		CheckoutSessionID: session.ID,
-		Type:              v1.TransactionTypeDebit,
-		Amount:            req.Amount,
-		PaymentStatus:     stripe.PaymentIntentStatusRequiresPaymentMethod,
+		From:                datastore.BankAccountID,
+		To:                  account.ID,
+		Amount:              amount,
+		Status:              v1.TransactionStatusProcesing,
+		PaymentIntentID:     dbr.NewNullString(pi.ID),
+		PaymentIntentSecret: dbr.NewNullString(pi.ClientSecret),
+		PaymentStatus:       dbr.NewNullString(pi.Status),
 	}
 
 	err = s.dm.CreateTransaction(ctx, transaction)
@@ -78,61 +94,6 @@ func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*
 	}
 
 	return &v1.MakePaymentResponse{
-		SessionId: transaction.CheckoutSessionID,
+		ClientSecret: pi.ClientSecret,
 	}, nil
-}
-
-func (s *Server) GetTransactions(ctx context.Context, req *v1.TransactionRequest) (*v1.TransactionListResponse, error) {
-	return &v1.TransactionListResponse{
-		Items: []*v1.TransactionResponse{},
-	}, nil
-}
-
-func (s *Server) SuccessStripeCallback(ctx context.Context, req *v1.StripePaymentRequest) (*protoempty.Empty, error) {
-	logger := s.logger.WithField("session_id", req.SessionId)
-	logger.Info("stripe payment succeed")
-
-	transaction, err := s.dm.GetTransactionByCheckoutSessionID(ctx, req.SessionId)
-	if err != nil {
-		if err == datastore.ErrTxNotFound {
-			return nil, rpc.ErrRpcBadRequest
-		}
-
-		logger.Errorf("failed to get transaction by checkout session id: %s", err)
-		return nil, rpc.ErrRpcInternal
-	}
-
-	if transaction.PaymentStatus == stripe.PaymentIntentStatusSucceeded {
-		return nil, rpc.ErrRpcBadRequest
-	}
-
-	session, err := checkout.Get(transaction.CheckoutSessionID, nil)
-	if err != nil {
-		logger.Warningf("failed to get checkout: %s", err)
-		return nil, rpc.ErrRpcBadRequest
-	}
-
-	if session.PaymentIntent != nil && session.PaymentIntent.ID != "" {
-		logger := logger.WithField("payment_intent_id", session.PaymentIntent.ID)
-
-		pi, err := paymentintent.Get(session.PaymentIntent.ID, nil)
-		if err != nil {
-			logger.Warningf("failed to get payment intent: %s", err)
-			return nil, rpc.ErrRpcBadRequest
-		}
-
-		logger.Infof("payment intent status is %s", pi.Status)
-
-		err = s.dm.UpdateTransactionPaymentIntent(ctx, transaction, pi)
-		if err != nil {
-			logger.Errorf("failed to update payment intent: %s", err)
-			return nil, rpc.ErrRpcInternal
-		}
-	}
-
-	return &protoempty.Empty{}, nil
-}
-
-func (s *Server) CancelStripeCallback(ctx context.Context, req *protoempty.Empty) (*protoempty.Empty, error) {
-	return &protoempty.Empty{}, nil
 }

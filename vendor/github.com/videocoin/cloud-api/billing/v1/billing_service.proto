@@ -3,7 +3,6 @@ syntax = "proto3";
 package cloud.api.billing.v1;
 
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
-import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
 option go_package = "v1";
@@ -20,24 +19,6 @@ service BillingService {
             body: "*"
         };
     }
-
-    rpc GetTransactions(TransactionRequest) returns (TransactionListResponse) {
-        option (google.api.http) = {
-            get: "/api/v1/billing/transactions"
-        };
-    }
-
-    rpc SuccessStripeCallback(StripePaymentRequest) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            get: "/api/v1/billing/stripe/{session_id}/success"
-        };
-    }
-
-    rpc CancelStripeCallback(google.protobuf.Empty) returns (google.protobuf.Empty) {
-        option (google.api.http) = {
-            get: "/api/v1/billing/stripe/cancel"
-        };
-    }
 }
 
 message MakePaymentRequest {
@@ -45,17 +26,5 @@ message MakePaymentRequest {
 }
 
 message MakePaymentResponse {
-    string session_id = 2;
-}
-
-message TransactionRequest {}
-
-message TransactionResponse {}
-
-message TransactionListResponse  {
-    repeated TransactionResponse items = 1;
-}
-
-message StripePaymentRequest {
-    string session_id = 1;
+    string client_secret = 1;
 }

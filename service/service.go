@@ -28,8 +28,6 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
-	stripeOpts := &rpc.StripeOpts{BaseCallbackURL: cfg.StripeBaseCallbackURL}
-
 	rpc, err := rpc.NewServer(
 		rpc.WithAddr(cfg.RPCAddr),
 		rpc.WithLogger(cfg.Logger.WithField("system", "rpc")),
@@ -37,7 +35,6 @@ func NewService(cfg *Config) (*Service, error) {
 		rpc.WithHealthService(),
 		rpc.WithAuthTokenSecret(cfg.AuthTokenSecret),
 		rpc.WithDataManager(dm),
-		rpc.WithStripeOpts(stripeOpts),
 		rpc.WithUsersServiceClient(cfg.UsersRPCAddr),
 	)
 	if err != nil {
