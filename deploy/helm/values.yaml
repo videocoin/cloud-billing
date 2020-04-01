@@ -1,0 +1,22 @@
+replicasCount: 3
+maxUnavailableCount: 0
+
+image:
+  repository: gcr.io/videocoin-network/billing
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  externalRpcPort: 5020
+  internalRpcPort: 5020
+
+autoscaler:
+  minCount: 1
+  maxCount: 10
+  targets:
+    targetCPUUtilizationPercentage: 70
+
+config: {}
+
+secrets: {}
