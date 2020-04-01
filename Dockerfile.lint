@@ -1,7 +1,0 @@
-FROM golangci/golangci-lint:v1.23.6
-
-WORKDIR /go/src/github.com/videocoin/cloud-billing
-
-COPY . .
-
-RUN golangci-lint run -v
