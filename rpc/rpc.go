@@ -43,10 +43,10 @@ func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*
 				logger.Errorf("failed to create account: %s", createErr)
 				return nil, rpc.ErrRpcInternal
 			}
+		} else {
+			logger.Errorf("failed to get account by user id: %s", err)
+			return nil, rpc.ErrRpcInternal
 		}
-
-		logger.Errorf("failed to get account by user id: %s", err)
-		return nil, rpc.ErrRpcInternal
 	}
 
 	if account.CustomerID.String == "" {
