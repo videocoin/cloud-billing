@@ -59,11 +59,20 @@ github.com/grpc-ecosystem/grpc-gateway/utilities
 github.com/kelseyhightower/envconfig
 # github.com/konsorten/go-windows-terminal-sequences v1.0.1
 github.com/konsorten/go-windows-terminal-sequences
+# github.com/labstack/echo v3.3.10+incompatible
+github.com/labstack/echo
+# github.com/labstack/gommon v0.2.9
+github.com/labstack/gommon/color
+github.com/labstack/gommon/log
 # github.com/leodido/go-urn v1.2.0
 github.com/leodido/go-urn
 # github.com/mailru/dbr v3.0.0+incompatible
 github.com/mailru/dbr
 github.com/mailru/dbr/dialect
+# github.com/mattn/go-colorable v0.1.2
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.8
+github.com/mattn/go-isatty
 # github.com/matttproud/golang_protobuf_extensions v1.0.1
 github.com/matttproud/golang_protobuf_extensions/pbutil
 # github.com/opentracing/opentracing-go v1.1.0
@@ -93,6 +102,7 @@ github.com/stripe/stripe-go
 github.com/stripe/stripe-go/customer
 github.com/stripe/stripe-go/form
 github.com/stripe/stripe-go/paymentintent
+github.com/stripe/stripe-go/webhook
 # github.com/uber/jaeger-client-go v2.22.1+incompatible
 github.com/uber/jaeger-client-go
 github.com/uber/jaeger-client-go/config
@@ -114,6 +124,10 @@ github.com/uber/jaeger-client-go/transport
 github.com/uber/jaeger-client-go/utils
 # github.com/uber/jaeger-lib v2.2.0+incompatible
 github.com/uber/jaeger-lib/metrics
+# github.com/valyala/bytebufferpool v1.0.0
+github.com/valyala/bytebufferpool
+# github.com/valyala/fasttemplate v1.0.1
+github.com/valyala/fasttemplate
 # github.com/videocoin/cloud-api v0.0.17 => ../cloud-api
 github.com/videocoin/cloud-api/accounts/v1
 github.com/videocoin/cloud-api/billing/v1
@@ -129,6 +143,9 @@ github.com/videocoin/cloud-pkg/tracer
 github.com/videocoin/cloud-pkg/uuid4
 # go.uber.org/atomic v1.5.1
 go.uber.org/atomic
+# golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
+golang.org/x/crypto/acme
+golang.org/x/crypto/acme/autocert
 # golang.org/x/lint v0.0.0-20191125180803-fdd1cda4f05f
 golang.org/x/lint
 golang.org/x/lint/golint

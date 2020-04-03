@@ -36,7 +36,6 @@ func New(opts ...Option) (*Manager, error) {
 func (m *Manager) Start() {
 	go m.checkPaymentStatus()
 	go m.unlockAllTransactions()
-
 }
 
 func (m *Manager) Stop() {
@@ -203,6 +202,21 @@ func (m *Manager) GetTransactionToCheckPayment(ctx context.Context) (*datastore.
 	defer tx.RollbackUnlessCommitted()
 
 	transaction, err := m.ds.Transactions.GetToCheckPayment(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return transaction, tx.Commit()
+}
+
+func (m *Manager) GetTransactionByPaymentID(ctx context.Context, id string) (*datastore.Transaction, error) {
+	ctx, _, tx, err := m.NewContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.RollbackUnlessCommitted()
+
+	transaction, err := m.ds.Transactions.GetByPaymentID(ctx, id)
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/videocoin/cloud-billing/eventbus"
 	"github.com/videocoin/cloud-billing/manager"
 	"github.com/videocoin/cloud-billing/rpc"
+	"github.com/videocoin/cloud-billing/stripehook"
 )
 
 type Service struct {
@@ -13,6 +14,7 @@ type Service struct {
 	rpc *rpc.Server
 	eb  *eventbus.EventBus
 	dm  *manager.Manager
+	shs *stripehook.Server
 }
 
 func NewService(cfg *Config) (*Service, error) {
@@ -54,11 +56,22 @@ func NewService(cfg *Config) (*Service, error) {
 
 	stripe.Key = cfg.StripeKey
 
+	shs, err := stripehook.NewServer(
+		cfg.StripeHookServerAddr,
+		stripehook.WithLogger(cfg.Logger.WithField("system", "stripehook")),
+		stripehook.WithSecret(cfg.StripeWHSecret),
+		stripehook.WithDataManager(dm),
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	svc := &Service{
 		cfg: cfg,
 		rpc: rpc,
 		eb:  eb,
 		dm:  dm,
+		shs: shs,
 	}
 
 	return svc, nil
@@ -68,6 +81,11 @@ func (s *Service) Start(errCh chan error) {
 	go func() {
 		s.cfg.Logger.Info("starting rpc server")
 		errCh <- s.rpc.Start()
+	}()
+
+	go func() {
+		s.cfg.Logger.Info("starting stripe hook server")
+		errCh <- s.shs.Start()
 	}()
 
 	go func() {
@@ -85,6 +103,11 @@ func (s *Service) Stop() error {
 	s.dm.Stop()
 
 	err := s.eb.Stop()
+	if err != nil {
+		return err
+	}
+
+	err = s.shs.Stop()
 	if err != nil {
 		return err
 	}

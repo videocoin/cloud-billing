@@ -12,6 +12,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/labstack/echo v3.3.10+incompatible
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mailru/dbr v3.0.0+incompatible
 	github.com/sirupsen/logrus v1.4.2
