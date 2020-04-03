@@ -10,6 +10,8 @@ service:
   type: ClusterIP
   externalRpcPort: 5020
   internalRpcPort: 5020
+  externalWHPort: 5028
+  internalWHPort: 5028
 
 autoscaler:
   minCount: 1

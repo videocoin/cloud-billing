@@ -40,6 +40,8 @@ spec:
               value: "6831"
             - name: RPC_ADDR
               value: 0.0.0.0:{{ .Values.service.internalRpcPort }}
+            - name: STRIPE_HOOK_SERVER_ADDR
+              value: 0.0.0.0:{{ .Values.service.internalWHPort }}
             - name: ACCOUNTS_RPC_ADDR
               valueFrom:
                 configMapKeyRef:
@@ -70,6 +72,11 @@ spec:
                 secretKeyRef:
                   name: {{ .Chart.Name }}
                   key: stripeKey
+            - name: STRIPE_WH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Chart.Name }}
+                  key: stripeWHSecret
             - name: SENTRY_DSN
               valueFrom:
                 secretKeyRef:
