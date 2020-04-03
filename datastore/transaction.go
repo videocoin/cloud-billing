@@ -25,4 +25,7 @@ type Transaction struct {
 
 	StreamID  dbr.NullString `db:"stream_id"`
 	ProfileID dbr.NullString `db:"profile_id"`
+
+	CheckedAt time.Time `db:"checked_at"`
+	IsLocked  bool      `db:"is_locked"`
 }

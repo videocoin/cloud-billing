@@ -12,6 +12,7 @@ type Service struct {
 	cfg *Config
 	rpc *rpc.Server
 	eb  *eventbus.EventBus
+	dm  *manager.Manager
 }
 
 func NewService(cfg *Config) (*Service, error) {
@@ -57,6 +58,7 @@ func NewService(cfg *Config) (*Service, error) {
 		cfg: cfg,
 		rpc: rpc,
 		eb:  eb,
+		dm:  dm,
 	}
 
 	return svc, nil
@@ -72,9 +74,16 @@ func (s *Service) Start(errCh chan error) {
 		s.cfg.Logger.Info("starting eventbus")
 		errCh <- s.eb.Start()
 	}()
+
+	go func() {
+		s.cfg.Logger.Info("starting manager")
+		s.dm.Start()
+	}()
 }
 
 func (s *Service) Stop() error {
+	s.dm.Stop()
+
 	err := s.eb.Stop()
 	if err != nil {
 		return err

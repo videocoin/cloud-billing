@@ -19,4 +19,5 @@ enum TransactionStatus {
     PROCESSING = 1 [(gogoproto.enumvalue_customname) = "TransactionStatusProcesing"];
     SUCCESS = 2 [(gogoproto.enumvalue_customname) = "TransactionStatusSuccess"];
     FAILED = 3 [(gogoproto.enumvalue_customname) = "TransactionStatusFailed"];
+    CANCELED = 4 [(gogoproto.enumvalue_customname) = "TransactionStatusCanceled"];
 }
