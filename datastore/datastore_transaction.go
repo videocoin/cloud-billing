@@ -130,6 +130,10 @@ func (ds *TransactionDatastore) Create(ctx context.Context, transaction *Transac
 		transaction.CreatedAt = time.Now()
 	}
 
+	if transaction.CheckedAt.IsZero() {
+		transaction.CheckedAt = time.Now()
+	}
+
 	cols := []string{
 		"id", "from", "to", "created_at", "status", "amount",
 		"payment_intent_secret", "payment_intent_id", "payment_status",
