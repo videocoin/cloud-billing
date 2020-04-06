@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package cloud.api.billing.v1;
 
+import "google/protobuf/empty.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 
@@ -13,6 +14,12 @@ option (gogoproto.goproto_registration) = true;
 option (gogoproto.messagename_all) = true;
 
 service BillingService {
+    rpc GetProfile(google.protobuf.Empty) returns (ProfileResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/billing/profile"
+        };
+    }
+
     rpc MakePayment(MakePaymentRequest) returns (MakePaymentResponse) {
         option (google.api.http) = {
             post: "/api/v1/billing/pay"
@@ -27,4 +34,8 @@ message MakePaymentRequest {
 
 message MakePaymentResponse {
     string client_secret = 1;
+}
+
+message ProfileResponse {
+    double balance = 1;
 }

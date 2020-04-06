@@ -5,10 +5,12 @@ package v1
 
 import (
 	context "context"
+	encoding_binary "encoding/binary"
 	fmt "fmt"
 	_ "github.com/gogo/googleapis/google/api"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
+	types "github.com/gogo/protobuf/types"
 	golang_proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -131,11 +133,64 @@ func (m *MakePaymentResponse) GetClientSecret() string {
 func (*MakePaymentResponse) XXX_MessageName() string {
 	return "cloud.api.billing.v1.MakePaymentResponse"
 }
+
+type ProfileResponse struct {
+	Balance              float64  `protobuf:"fixed64,1,opt,name=balance,proto3" json:"balance,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ProfileResponse) Reset()         { *m = ProfileResponse{} }
+func (m *ProfileResponse) String() string { return proto.CompactTextString(m) }
+func (*ProfileResponse) ProtoMessage()    {}
+func (*ProfileResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e1bde738a35a0fff, []int{2}
+}
+func (m *ProfileResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ProfileResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ProfileResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ProfileResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ProfileResponse.Merge(m, src)
+}
+func (m *ProfileResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *ProfileResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ProfileResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ProfileResponse proto.InternalMessageInfo
+
+func (m *ProfileResponse) GetBalance() float64 {
+	if m != nil {
+		return m.Balance
+	}
+	return 0
+}
+
+func (*ProfileResponse) XXX_MessageName() string {
+	return "cloud.api.billing.v1.ProfileResponse"
+}
 func init() {
 	proto.RegisterType((*MakePaymentRequest)(nil), "cloud.api.billing.v1.MakePaymentRequest")
 	golang_proto.RegisterType((*MakePaymentRequest)(nil), "cloud.api.billing.v1.MakePaymentRequest")
 	proto.RegisterType((*MakePaymentResponse)(nil), "cloud.api.billing.v1.MakePaymentResponse")
 	golang_proto.RegisterType((*MakePaymentResponse)(nil), "cloud.api.billing.v1.MakePaymentResponse")
+	proto.RegisterType((*ProfileResponse)(nil), "cloud.api.billing.v1.ProfileResponse")
+	golang_proto.RegisterType((*ProfileResponse)(nil), "cloud.api.billing.v1.ProfileResponse")
 }
 
 func init() { proto.RegisterFile("billing/v1/billing_service.proto", fileDescriptor_e1bde738a35a0fff) }
@@ -144,26 +199,30 @@ func init() {
 }
 
 var fileDescriptor_e1bde738a35a0fff = []byte{
-	// 292 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x90, 0xcd, 0x4a, 0x03, 0x31,
-	0x14, 0x85, 0x49, 0x85, 0x82, 0xf1, 0x67, 0x91, 0x8a, 0x94, 0x22, 0xa1, 0x8c, 0x9b, 0x2a, 0x9a,
-	0x30, 0xba, 0xeb, 0xb2, 0x7b, 0x41, 0xa6, 0x3b, 0x37, 0x25, 0x33, 0xc6, 0x18, 0x9c, 0xc9, 0x1d,
-	0x27, 0x99, 0x81, 0x6e, 0xfb, 0x0a, 0xe2, 0xfb, 0xb8, 0xec, 0x52, 0xf0, 0x05, 0x64, 0xea, 0x83,
-	0x08, 0xc9, 0x80, 0x8a, 0x2e, 0xdc, 0xdd, 0x73, 0xf3, 0xe5, 0x72, 0xce, 0xc1, 0xe3, 0x54, 0xe7,
-	0xb9, 0x36, 0x8a, 0x37, 0x31, 0xef, 0xc6, 0x85, 0x95, 0x55, 0xa3, 0x33, 0xc9, 0xca, 0x0a, 0x1c,
-	0x90, 0x83, 0x2c, 0x87, 0xfa, 0x96, 0x89, 0x52, 0xb3, 0x0e, 0x60, 0x4d, 0x3c, 0x3a, 0x57, 0xda,
-	0xdd, 0xd7, 0x29, 0xcb, 0xa0, 0xe0, 0x0a, 0x14, 0x70, 0x0f, 0xa7, 0xf5, 0x9d, 0x57, 0x5e, 0xf8,
-	0x29, 0x1c, 0x19, 0x1d, 0x29, 0x00, 0x95, 0x4b, 0x2e, 0x4a, 0xcd, 0x85, 0x31, 0xe0, 0x84, 0xd3,
-	0x60, 0x6c, 0x78, 0x8d, 0xce, 0x30, 0xb9, 0x12, 0x0f, 0xf2, 0x5a, 0x2c, 0x0b, 0x69, 0x5c, 0x22,
-	0x1f, 0x6b, 0x69, 0x1d, 0x39, 0xc4, 0x7d, 0x51, 0x40, 0x6d, 0xdc, 0x10, 0x8d, 0xd1, 0x64, 0x2b,
-	0xe9, 0x54, 0x34, 0xc5, 0x83, 0x1f, 0xb4, 0x2d, 0xc1, 0x58, 0x49, 0x8e, 0xf1, 0x5e, 0x96, 0x6b,
-	0x69, 0xdc, 0xc2, 0xca, 0xac, 0x92, 0xe1, 0xd7, 0x76, 0xb2, 0x1b, 0x96, 0x73, 0xbf, 0xbb, 0x78,
-	0x46, 0x78, 0x7f, 0x16, 0x52, 0xcc, 0x43, 0x4a, 0xb2, 0x42, 0x78, 0xe7, 0xdb, 0x3d, 0x32, 0x61,
-	0x7f, 0x05, 0x66, 0xbf, 0x0d, 0x8e, 0x4e, 0xfe, 0x41, 0x06, 0x73, 0x11, 0x5d, 0xbd, 0x7d, 0x3c,
-	0xf5, 0x86, 0xd1, 0xc0, 0x37, 0xf0, 0xd5, 0x35, 0x2f, 0xc5, 0x72, 0x8a, 0x4e, 0x67, 0xc3, 0x75,
-	0x4b, 0xd1, 0x6b, 0x4b, 0xd1, 0x7b, 0x4b, 0xd1, 0xcb, 0x86, 0xa2, 0xf5, 0x86, 0xa2, 0x9b, 0x5e,
-	0x13, 0xa7, 0x7d, 0x5f, 0xd1, 0xe5, 0x67, 0x00, 0x00, 0x00, 0xff, 0xff, 0x79, 0xe8, 0x89, 0x04,
-	0xa9, 0x01, 0x00, 0x00,
+	// 366 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x51, 0xcd, 0x4a, 0xeb, 0x40,
+	0x18, 0x65, 0x7a, 0xa1, 0x97, 0x3b, 0xf7, 0x0f, 0xa6, 0x97, 0xde, 0xdc, 0x5c, 0x89, 0x25, 0x22,
+	0xd4, 0xbf, 0x09, 0xd5, 0x5d, 0x97, 0x05, 0x71, 0x25, 0x94, 0x74, 0xe7, 0xa6, 0x4c, 0xe2, 0xd7,
+	0x38, 0x38, 0x99, 0x89, 0xc9, 0x24, 0xd0, 0x6d, 0x7d, 0x04, 0x5f, 0xc8, 0x65, 0x97, 0x82, 0x2f,
+	0x20, 0xad, 0x0f, 0x22, 0x9d, 0xa4, 0x56, 0x6d, 0x17, 0xee, 0xbe, 0xf3, 0xe5, 0x9c, 0x93, 0xef,
+	0x9c, 0xc1, 0xad, 0x80, 0x0b, 0xc1, 0x65, 0xe4, 0x15, 0x1d, 0xaf, 0x1a, 0x87, 0x19, 0xa4, 0x05,
+	0x0f, 0x81, 0x26, 0xa9, 0xd2, 0x8a, 0xfc, 0x09, 0x85, 0xca, 0x2f, 0x29, 0x4b, 0x38, 0xad, 0x08,
+	0xb4, 0xe8, 0xd8, 0xff, 0x23, 0xa5, 0x22, 0x01, 0x9e, 0xe1, 0x04, 0xf9, 0xc8, 0x83, 0x38, 0xd1,
+	0xe3, 0x52, 0x62, 0x1f, 0x45, 0x5c, 0x5f, 0xe5, 0x01, 0x0d, 0x55, 0xec, 0x45, 0x2a, 0x52, 0x2b,
+	0xd6, 0x02, 0x19, 0x60, 0xa6, 0x8a, 0xbe, 0x55, 0x79, 0xb1, 0x84, 0x7b, 0x4c, 0x4a, 0xa5, 0x99,
+	0xe6, 0x4a, 0x66, 0xe5, 0x57, 0xf7, 0x10, 0x93, 0x73, 0x76, 0x0d, 0x7d, 0x36, 0x8e, 0x41, 0x6a,
+	0x1f, 0x6e, 0x72, 0xc8, 0x34, 0x69, 0xe2, 0x3a, 0x8b, 0x55, 0x2e, 0xb5, 0x85, 0x5a, 0xa8, 0xfd,
+	0xc5, 0xaf, 0x90, 0xdb, 0xc5, 0x8d, 0x77, 0xec, 0x2c, 0x51, 0x32, 0x03, 0xb2, 0x83, 0x7f, 0x86,
+	0x82, 0x83, 0xd4, 0xc3, 0x0c, 0xc2, 0x14, 0x4a, 0xd5, 0x37, 0xff, 0x47, 0xb9, 0x1c, 0x98, 0x9d,
+	0x7b, 0x80, 0x7f, 0xf7, 0x53, 0x35, 0xe2, 0x02, 0x5e, 0x75, 0x16, 0xfe, 0x1a, 0x30, 0xc1, 0x64,
+	0x08, 0x46, 0x81, 0xfc, 0x25, 0x3c, 0xbe, 0xad, 0xe1, 0x5f, 0xbd, 0xb2, 0x8f, 0x41, 0xd9, 0x17,
+	0x11, 0x18, 0x9f, 0x81, 0xae, 0x2c, 0x48, 0x93, 0x96, 0xb1, 0xe8, 0x32, 0x3c, 0x3d, 0x5d, 0x54,
+	0x64, 0xef, 0xd2, 0x4d, 0x85, 0xd2, 0x0f, 0x7f, 0x76, 0xb7, 0x27, 0x8f, 0xcf, 0x77, 0xb5, 0x7f,
+	0xe4, 0xaf, 0xa9, 0x65, 0xf5, 0x3a, 0x8b, 0x2e, 0x8d, 0xff, 0x04, 0xe1, 0xef, 0x6f, 0xa2, 0x92,
+	0xf6, 0x66, 0xdf, 0xf5, 0xee, 0xec, 0xbd, 0x4f, 0x30, 0xab, 0x2b, 0x1c, 0x73, 0x85, 0xe5, 0x36,
+	0xd6, 0xae, 0x60, 0xe3, 0x2e, 0xda, 0xef, 0x59, 0xd3, 0x99, 0x83, 0x1e, 0x66, 0x0e, 0x7a, 0x9a,
+	0x39, 0xe8, 0x7e, 0xee, 0xa0, 0xe9, 0xdc, 0x41, 0x17, 0xb5, 0xa2, 0x13, 0xd4, 0x4d, 0xec, 0x93,
+	0x97, 0x00, 0x00, 0x00, 0xff, 0xff, 0x83, 0x36, 0xaa, 0xfc, 0x61, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -178,6 +237,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type BillingServiceClient interface {
+	GetProfile(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*ProfileResponse, error)
 	MakePayment(ctx context.Context, in *MakePaymentRequest, opts ...grpc.CallOption) (*MakePaymentResponse, error)
 }
 
@@ -187,6 +247,15 @@ type billingServiceClient struct {
 
 func NewBillingServiceClient(cc *grpc.ClientConn) BillingServiceClient {
 	return &billingServiceClient{cc}
+}
+
+func (c *billingServiceClient) GetProfile(ctx context.Context, in *types.Empty, opts ...grpc.CallOption) (*ProfileResponse, error) {
+	out := new(ProfileResponse)
+	err := c.cc.Invoke(ctx, "/cloud.api.billing.v1.BillingService/GetProfile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *billingServiceClient) MakePayment(ctx context.Context, in *MakePaymentRequest, opts ...grpc.CallOption) (*MakePaymentResponse, error) {
@@ -200,6 +269,7 @@ func (c *billingServiceClient) MakePayment(ctx context.Context, in *MakePaymentR
 
 // BillingServiceServer is the server API for BillingService service.
 type BillingServiceServer interface {
+	GetProfile(context.Context, *types.Empty) (*ProfileResponse, error)
 	MakePayment(context.Context, *MakePaymentRequest) (*MakePaymentResponse, error)
 }
 
@@ -207,12 +277,33 @@ type BillingServiceServer interface {
 type UnimplementedBillingServiceServer struct {
 }
 
+func (*UnimplementedBillingServiceServer) GetProfile(ctx context.Context, req *types.Empty) (*ProfileResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProfile not implemented")
+}
 func (*UnimplementedBillingServiceServer) MakePayment(ctx context.Context, req *MakePaymentRequest) (*MakePaymentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MakePayment not implemented")
 }
 
 func RegisterBillingServiceServer(s *grpc.Server, srv BillingServiceServer) {
 	s.RegisterService(&_BillingService_serviceDesc, srv)
+}
+
+func _BillingService_GetProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(types.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BillingServiceServer).GetProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/cloud.api.billing.v1.BillingService/GetProfile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BillingServiceServer).GetProfile(ctx, req.(*types.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _BillingService_MakePayment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -237,6 +328,10 @@ var _BillingService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "cloud.api.billing.v1.BillingService",
 	HandlerType: (*BillingServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetProfile",
+			Handler:    _BillingService_GetProfile_Handler,
+		},
 		{
 			MethodName: "MakePayment",
 			Handler:    _BillingService_MakePayment_Handler,
@@ -312,6 +407,39 @@ func (m *MakePaymentResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *ProfileResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ProfileResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ProfileResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.Balance != 0 {
+		i -= 8
+		encoding_binary.LittleEndian.PutUint64(dAtA[i:], uint64(math.Float64bits(float64(m.Balance))))
+		i--
+		dAtA[i] = 0x9
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintBillingService(dAtA []byte, offset int, v uint64) int {
 	offset -= sovBillingService(v)
 	base := offset
@@ -347,6 +475,21 @@ func (m *MakePaymentResponse) Size() (n int) {
 	l = len(m.ClientSecret)
 	if l > 0 {
 		n += 1 + l + sovBillingService(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *ProfileResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Balance != 0 {
+		n += 9
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -494,6 +637,71 @@ func (m *MakePaymentResponse) Unmarshal(dAtA []byte) error {
 			}
 			m.ClientSecret = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipBillingService(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthBillingService
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthBillingService
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ProfileResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowBillingService
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ProfileResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ProfileResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 1 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Balance", wireType)
+			}
+			var v uint64
+			if (iNdEx + 8) > l {
+				return io.ErrUnexpectedEOF
+			}
+			v = uint64(encoding_binary.LittleEndian.Uint64(dAtA[iNdEx:]))
+			iNdEx += 8
+			m.Balance = float64(math.Float64frombits(v))
 		default:
 			iNdEx = preIndex
 			skippy, err := skipBillingService(dAtA[iNdEx:])
