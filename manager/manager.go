@@ -313,3 +313,22 @@ func (m *Manager) MarkTransactionPaymentStatusAs(ctx context.Context, transactio
 
 	return tx.Commit()
 }
+
+func (m *Manager) GetBalance(ctx context.Context, account *datastore.Account) (float64, error) {
+	ctx, _, tx, err := m.NewContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+	defer tx.RollbackUnlessCommitted()
+
+	balance, err := m.ds.Transactions.CalcBalance(ctx, account)
+	if err != nil {
+		return 0, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return 0, err
+	}
+
+	return balance, nil
+}

@@ -287,3 +287,31 @@ func (ds *TransactionDatastore) MarkAsFailed(ctx context.Context, transaction *T
 func (ds *TransactionDatastore) MarkPaymentStatusAs(ctx context.Context, transaction *Transaction, status stripe.PaymentIntentStatus) error {
 	return ds.markPaymentStatusAs(ctx, transaction, status)
 }
+
+func (ds *TransactionDatastore) CalcBalance(ctx context.Context, account *Account) (float64, error) {
+	tx, ok := dbrutil.DbTxFromContext(ctx)
+	if !ok {
+		sess := ds.conn.NewSession(nil)
+		tx, err := sess.Begin()
+		if err != nil {
+			return 0, err
+		}
+
+		defer func() {
+			err = tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
+	}
+
+	balance := float64(0)
+	err := tx.
+		Select("SUM(amount)/100").
+		From(ds.table).
+		Where("`to` = ? AND status = ?", account.ID, v1.TransactionStatusSuccess).
+		LoadStruct(&balance)
+	if err != nil {
+		return 0, err
+	}
+
+	return balance, nil
+}

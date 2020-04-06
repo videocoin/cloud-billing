@@ -3,8 +3,8 @@ package rpc
 import (
 	"context"
 
+	prototypes "github.com/gogo/protobuf/types"
 	"github.com/mailru/dbr"
-
 	"github.com/sirupsen/logrus"
 	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/customer"
@@ -14,6 +14,36 @@ import (
 	usersv1 "github.com/videocoin/cloud-api/users/v1"
 	"github.com/videocoin/cloud-billing/datastore"
 )
+
+func (s *Server) GetProfile(ctx context.Context, req *prototypes.Empty) (*v1.ProfileResponse, error) {
+	userID, err := s.authenticate(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	logger := s.logger.WithField("user_id", userID)
+
+	profile := new(v1.ProfileResponse)
+
+	account, err := s.dm.GetAccountByUserID(ctx, userID)
+	if err != nil {
+		if err == datastore.ErrAccountNotFound {
+			return profile, nil
+		}
+		logger.Errorf("failed to get account by user id: %s", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	balance, err := s.dm.GetBalance(ctx, account)
+	if err != nil {
+		logger.Errorf("failed to get balance: %s", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	profile.Balance = balance
+
+	return profile, nil
+}
 
 func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*v1.MakePaymentResponse, error) {
 	userID, err := s.authenticate(ctx)
