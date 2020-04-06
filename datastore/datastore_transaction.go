@@ -309,7 +309,7 @@ func (ds *TransactionDatastore) CalcBalance(ctx context.Context, account *Accoun
 
 	balance := float64(0)
 	err := tx.
-		Select("SUM(amount)/100").
+		Select("COALESCE(SUM(amount)/100)").
 		From(ds.table).
 		Where("`to` = ? AND status = ?", account.ID, v1.TransactionStatusSuccess).
 		LoadStruct(&balance)
