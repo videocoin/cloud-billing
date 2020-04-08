@@ -74,9 +74,8 @@ message TransactionResponse {
     string id = 1 [(gogoproto.customname) = "ID"];
     TransactionType type = 2;
     TransactionStatus status = 3;
-    string stream_id = 4 [(gogoproto.customname) = "StreamID"];
-    string stream_name = 5;
-    double total_cost = 6;
+    google.protobuf.Timestamp created_at = 4 [(gogoproto.stdtime) = true];
+    double amount = 5;
 }
 
 message TransactionsResponse {
