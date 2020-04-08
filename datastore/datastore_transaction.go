@@ -344,7 +344,7 @@ func (ds *TransactionDatastore) CalcBalance(ctx context.Context, account *Accoun
 
 	debet := pointer.ToFloat64(0)
 	err := tx.
-		Select("COALESCE(SUM(amount)/100)").
+		Select("COALESCE(SUM(amount)/100, 0)").
 		From(ds.table).
 		Where("`to` = ? AND status = ?", account.ID, v1.TransactionStatusSuccess).
 		LoadStruct(debet)
@@ -354,7 +354,7 @@ func (ds *TransactionDatastore) CalcBalance(ctx context.Context, account *Accoun
 
 	credit := pointer.ToFloat64(0)
 	err = tx.
-		Select("COALESCE(SUM(amount)/100)").
+		Select("COALESCE(SUM(amount)/100, 0)").
 		From(ds.table).
 		Where("`from` = ? AND status = ?", account.ID, v1.TransactionStatusSuccess).
 		LoadStruct(credit)
