@@ -415,21 +415,34 @@ func (ds *TransactionDatastore) GetCharges(ctx context.Context, account *Account
 }
 
 func (ds *TransactionDatastore) GetTransactions(ctx context.Context, account *Account) ([]*v1.TransactionResponse, error) {
-	// tx, ok := dbrutil.DbTxFromContext(ctx)
-	// if !ok {
-	// 	sess := ds.conn.NewSession(nil)
-	// 	tx, err := sess.Begin()
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
+	tx, ok := dbrutil.DbTxFromContext(ctx)
+	if !ok {
+		sess := ds.conn.NewSession(nil)
+		tx, err := sess.Begin()
+		if err != nil {
+			return nil, err
+		}
 
-	// 	defer func() {
-	// 		err = tx.Commit()
-	// 		tx.RollbackUnlessCommitted()
-	// 	}()
-	// }
+		defer func() {
+			err = tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
+	}
 
 	transactions := []*v1.TransactionResponse{}
+	_, err := tx.
+		Select("id", "created_at", "amount/100 as amount", "status").
+		From(ds.table).
+		Where("`to` = ? AND `from` = ?", account.ID, BankAccountID).
+		OrderBy("created_at DESC").
+		Load(&transactions)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, t := range transactions {
+		t.Type = v1.TransactionTypeDeposit
+	}
 
 	return transactions, nil
 }
