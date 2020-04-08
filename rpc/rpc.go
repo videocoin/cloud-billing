@@ -110,7 +110,7 @@ func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*
 	transaction := &datastore.Transaction{
 		From:                datastore.BankAccountID,
 		To:                  account.ID,
-		Amount:              amount,
+		Amount:              float64(amount),
 		Status:              v1.TransactionStatusProcesing,
 		PaymentIntentID:     dbr.NewNullString(pi.ID),
 		PaymentIntentSecret: dbr.NewNullString(pi.ClientSecret),

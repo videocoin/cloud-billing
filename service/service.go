@@ -26,6 +26,7 @@ func NewService(cfg *Config) (*Service, error) {
 	dm, err := manager.New(
 		manager.WithLogger(cfg.Logger.WithField("system", "datamanager")),
 		manager.WithDatastore(ds),
+		manager.WithUsersServiceClient(cfg.UsersRPCAddr),
 	)
 	if err != nil {
 		return nil, err

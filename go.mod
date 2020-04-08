@@ -15,7 +15,9 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/leodido/go-urn v1.2.0 // indirect
 	github.com/mailru/dbr v3.0.0+incompatible
+	github.com/opentracing/opentracing-go v1.1.0
 	github.com/sirupsen/logrus v1.4.2
+	github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94
 	github.com/stripe/stripe-go v70.9.0+incompatible
 	github.com/videocoin/cloud-api v0.0.17
 	github.com/videocoin/cloud-pkg v0.0.5

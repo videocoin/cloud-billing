@@ -2,21 +2,27 @@ package manager
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/mailru/dbr"
 	"github.com/sirupsen/logrus"
 	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/paymentintent"
+	v1 "github.com/videocoin/cloud-api/billing/v1"
+	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
+	usersv1 "github.com/videocoin/cloud-api/users/v1"
 	"github.com/videocoin/cloud-billing/datastore"
 	"github.com/videocoin/cloud-pkg/dbrutil"
 )
 
 type Manager struct {
-	logger    *logrus.Entry
-	ds        *datastore.Datastore
 	cpsticker *time.Ticker
 	uatticker *time.Ticker
+	logger    *logrus.Entry
+	ds        *datastore.Datastore
+	users     usersv1.UserServiceClient
 }
 
 func New(opts ...Option) (*Manager, error) {
@@ -144,6 +150,28 @@ func (m *Manager) CreateAccount(ctx context.Context, account *datastore.Account)
 	return tx.Commit()
 }
 
+func (m *Manager) GetOrCreateAccountByUserID(ctx context.Context, userID string) (*datastore.Account, error) {
+	account, err := m.GetAccountByUserID(ctx, userID)
+	if err != nil {
+		if err == datastore.ErrAccountNotFound {
+			user, err := m.users.GetById(ctx, &usersv1.UserRequest{Id: userID})
+			if err != nil {
+				return nil, fmt.Errorf("failed to get user: %s", err)
+			}
+
+			account = &datastore.Account{UserID: user.ID, Email: user.Email}
+			createErr := m.CreateAccount(ctx, account)
+			if createErr != nil {
+				return nil, fmt.Errorf("failed to create account: %s", createErr)
+			}
+		} else {
+			return nil, fmt.Errorf("failed to get account by user id: %s", err)
+		}
+	}
+
+	return account, nil
+}
+
 func (m *Manager) GetAccountByUserID(ctx context.Context, userID string) (*datastore.Account, error) {
 	ctx, _, tx, err := m.NewContext(ctx)
 	if err != nil {
@@ -192,6 +220,53 @@ func (m *Manager) CreateTransaction(ctx context.Context, transaction *datastore.
 	}
 
 	return tx.Commit()
+}
+
+func (m *Manager) CreateTransactionFromEvent(ctx context.Context, event *dispatcherv1.Event) (*datastore.Transaction, error) {
+	ctx, _, tx, err := m.NewContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.RollbackUnlessCommitted()
+
+	if event.UserID == "" {
+		return nil, errors.New("empty user_id")
+	}
+
+	if event.ClientUserID == "" {
+		return nil, errors.New("empty client_user_id")
+	}
+
+	from, err := m.GetOrCreateAccountByUserID(ctx, event.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	to, err := m.GetOrCreateAccountByUserID(ctx, event.ClientUserID)
+	if err != nil {
+		return nil, err
+	}
+
+	transaction := &datastore.Transaction{
+		From:                  from.ID,
+		To:                    to.ID,
+		Amount:                event.Price * event.Duration * 100,
+		Status:                v1.TransactionStatusPending,
+		StreamID:              dbr.NewNullString(event.StreamID),
+		ProfileID:             dbr.NewNullString(event.ProfileID),
+		TaskID:                dbr.NewNullString(event.TaskID),
+		StreamContractAddress: dbr.NewNullString(event.StreamContractAddress),
+		ChunkNum:              dbr.NewNullInt64(int64(event.ChunkNum)),
+		Duration:              dbr.NewNullInt64(int64(event.Duration)),
+		Price:                 dbr.NewNullFloat64(event.Price * 100),
+	}
+
+	err = m.ds.Transactions.Create(ctx, transaction)
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, tx.Commit()
 }
 
 func (m *Manager) GetTransactionToCheckPayment(ctx context.Context) (*datastore.Transaction, error) {

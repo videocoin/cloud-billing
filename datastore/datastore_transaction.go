@@ -135,9 +135,10 @@ func (ds *TransactionDatastore) Create(ctx context.Context, transaction *Transac
 	}
 
 	cols := []string{
-		"id", "from", "to", "created_at", "status", "amount",
+		"id", "from", "to", "created_at", "status", "amount", "checked_at", "is_locked",
 		"payment_intent_secret", "payment_intent_id", "payment_status",
-		"stream_id", "profile_id", "checked_at", "is_locked"}
+		"stream_id", "profile_id", "task_id", "stream_contract_address", "chunk_num",
+		"duration", "price"}
 	_, err := tx.InsertInto(ds.table).Columns(cols...).Record(transaction).Exec()
 	if err != nil {
 		return err
