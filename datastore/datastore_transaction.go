@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/AlekSi/pointer"
 	"github.com/mailru/dbr"
 	"github.com/stripe/stripe-go"
 	v1 "github.com/videocoin/cloud-api/billing/v1"
@@ -340,15 +341,36 @@ func (ds *TransactionDatastore) CalcBalance(ctx context.Context, account *Accoun
 		}()
 	}
 
-	balance := float64(0)
+	debet := pointer.ToFloat64(0)
 	err := tx.
 		Select("COALESCE(SUM(amount)/100)").
 		From(ds.table).
 		Where("`to` = ? AND status = ?", account.ID, v1.TransactionStatusSuccess).
-		LoadStruct(&balance)
+		LoadStruct(debet)
 	if err != nil {
 		return 0, err
 	}
+
+	credit := pointer.ToFloat64(0)
+	err = tx.
+		Select("COALESCE(SUM(amount)/100)").
+		From(ds.table).
+		Where("`from` = ? AND status = ?", account.ID, v1.TransactionStatusSuccess).
+		LoadStruct(credit)
+	if err != nil {
+		return 0, err
+	}
+
+	d := float64(0)
+	c := float64(0)
+	if debet != nil {
+		d = *debet
+	}
+	if credit != nil {
+		c = *credit
+	}
+
+	balance := d - c
 
 	return balance, nil
 }
