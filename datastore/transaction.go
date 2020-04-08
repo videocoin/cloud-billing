@@ -26,11 +26,18 @@ type Transaction struct {
 	PaymentIntentID     dbr.NullString `db:"payment_intent_id"`
 	PaymentStatus       dbr.NullString `db:"payment_status"`
 
-	StreamID              dbr.NullString  `db:"stream_id"`
-	ProfileID             dbr.NullString  `db:"profile_id"`
-	TaskID                dbr.NullString  `db:"task_id"`
-	StreamContractAddress dbr.NullString  `db:"stream_contract_address"`
-	ChunkNum              dbr.NullInt64   `db:"chunk_num"`
-	Duration              dbr.NullInt64   `db:"duration"`
-	Price                 dbr.NullFloat64 `db:"price"`
+	StreamID              dbr.NullString `db:"stream_id"`
+	StreamName            dbr.NullString `db:"stream_name"`
+	StreamContractAddress dbr.NullString `db:"stream_contract_address"`
+	StreamIsLive          bool           `db:"stream_is_live"`
+
+	ProfileID   dbr.NullString  `db:"profile_id"`
+	ProfileName dbr.NullString  `db:"profile_name"`
+	ProfileCost dbr.NullFloat64 `db:"profile_cost"`
+
+	TaskID   dbr.NullString `db:"task_id"`
+	ChunkNum dbr.NullInt64  `db:"chunk_num"`
+	Duration dbr.NullInt64  `db:"duration"`
+
+	Price dbr.NullFloat64 `db:"price"`
 }

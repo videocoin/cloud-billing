@@ -16,9 +16,15 @@ CREATE TABLE billing_transactions (
     `payment_status`        VARCHAR(255) DEFAULT NULL,
 
     `stream_id`               VARCHAR(255) DEFAULT NULL,
-    `profile_id`              VARCHAR(255) DEFAULT NULL,
-    `task_id`                 VARCHAR(255) DEFAULT NULL,
+    `stream_name`             VARCHAR(255) DEFAULT NULL,
     `stream_contract_address` VARCHAR(255) DEFAULT NULL,
+    `stream_is_live`          TINYINT(1) DEFAULT 0,
+
+    `profile_id`              VARCHAR(255) DEFAULT NULL,
+    `profile_name`            VARCHAR(255) DEFAULT NULL,
+    `profile_cost`            DECIMAL(10,4) DEFAULT NULL,
+
+    `task_id`                 VARCHAR(255) DEFAULT NULL,
     `chunk_num`               INT DEFAULT NULL,
     `duration`                INT DEFAULT NULL,
     `price`                   DECIMAL(10,4) DEFAULT NULL,

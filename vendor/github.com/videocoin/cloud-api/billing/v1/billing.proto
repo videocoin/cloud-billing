@@ -21,3 +21,12 @@ enum TransactionStatus {
     FAILED = 3 [(gogoproto.enumvalue_customname) = "TransactionStatusFailed"];
     CANCELED = 4 [(gogoproto.enumvalue_customname) = "TransactionStatusCanceled"];
 }
+
+enum TransactionType {
+    option (gogoproto.goproto_enum_prefix) = false;
+    option (gogoproto.enum_customname) = "TransactionType";
+
+    UNKNOWN_TYPE = 0 [(gogoproto.enumvalue_customname) = "TransactionTypeUnknown"];
+    DEPOSIT = 1 [(gogoproto.enumvalue_customname) = "TransactionTypeDeposit"];
+    PAYMENT = 2 [(gogoproto.enumvalue_customname) = "TransactionTypePayment"];
+}

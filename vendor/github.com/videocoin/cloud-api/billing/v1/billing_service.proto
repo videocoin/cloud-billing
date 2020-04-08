@@ -5,6 +5,8 @@ package cloud.api.billing.v1;
 import "google/protobuf/empty.proto";
 import "github.com/gogo/protobuf/gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "billing/v1/billing.proto";
 
 option go_package = "v1";
 option (gogoproto.marshaler_all) = true;
@@ -26,6 +28,18 @@ service BillingService {
             body: "*"
         };
     }
+
+    rpc GetCharges(google.protobuf.Empty) returns (ChargesResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/billing/charges"
+        };
+    }
+
+    rpc GetTransactions(google.protobuf.Empty) returns (TransactionsResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/billing/transactions"
+        };
+    }
 }
 
 message MakePaymentRequest {
@@ -38,4 +52,33 @@ message MakePaymentResponse {
 
 message ProfileResponse {
     double balance = 1;
+}
+
+message ChargeResponse {
+    string stream_id = 1 [(gogoproto.customname) = "StreamID"];
+    string stream_name = 2;
+    bool stream_is_live = 3;
+    string stream_profile_id = 4 [(gogoproto.customname) = "StreamProfileID"];
+    string stream_profile_name = 5;
+    google.protobuf.Timestamp created_at = 6 [(gogoproto.stdtime) = true];
+    double duration = 7;
+    double cost = 8;
+    double total_cost = 9;
+}
+
+message ChargesResponse {
+    repeated ChargeResponse items = 1;
+}
+
+message TransactionResponse {
+    string id = 1 [(gogoproto.customname) = "ID"];
+    TransactionType type = 2;
+    TransactionStatus status = 3;
+    string stream_id = 4 [(gogoproto.customname) = "StreamID"];
+    string stream_name = 5;
+    double total_cost = 6;
+}
+
+message TransactionsResponse {
+    repeated TransactionResponse items = 1;
 }

@@ -127,3 +127,17 @@ func (s *Server) MakePayment(ctx context.Context, req *v1.MakePaymentRequest) (*
 		ClientSecret: pi.ClientSecret,
 	}, nil
 }
+
+func (s *Server) GetCharges(ctx context.Context, req *prototypes.Empty) (*v1.ChargesResponse, error) {
+	resp := &v1.ChargesResponse{
+		Items: []*v1.ChargeResponse{},
+	}
+	return resp, nil
+}
+
+func (s *Server) GetTransactions(ctx context.Context, req *prototypes.Empty) (*v1.TransactionsResponse, error) {
+	resp := &v1.TransactionsResponse{
+		Items: []*v1.TransactionResponse{},
+	}
+	return resp, nil
+}

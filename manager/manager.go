@@ -251,15 +251,19 @@ func (m *Manager) CreateTransactionFromEvent(ctx context.Context, event *dispatc
 	transaction := &datastore.Transaction{
 		From:                  from.ID,
 		To:                    to.ID,
-		Amount:                event.Price * event.Duration * 100,
 		Status:                v1.TransactionStatusPending,
 		StreamID:              dbr.NewNullString(event.StreamID),
-		ProfileID:             dbr.NewNullString(event.ProfileID),
-		TaskID:                dbr.NewNullString(event.TaskID),
 		StreamContractAddress: dbr.NewNullString(event.StreamContractAddress),
+		StreamName:            dbr.NewNullString(event.StreamName),
+		StreamIsLive:          event.StreamIsLive,
+		ProfileID:             dbr.NewNullString(event.ProfileID),
+		ProfileName:           dbr.NewNullString(event.ProfileName),
+		ProfileCost:           dbr.NewNullFloat64(event.ProfileCost),
+		TaskID:                dbr.NewNullString(event.TaskID),
 		ChunkNum:              dbr.NewNullInt64(int64(event.ChunkNum)),
 		Duration:              dbr.NewNullInt64(int64(event.Duration)),
-		Price:                 dbr.NewNullFloat64(event.Price * 100),
+		Price:                 dbr.NewNullFloat64(event.CostPerSec),
+		Amount:                event.CostPerSec * event.Duration * 100,
 	}
 
 	err = m.ds.Transactions.Create(ctx, transaction)
