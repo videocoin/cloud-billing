@@ -219,6 +219,38 @@ func (ds *TransactionDatastore) GetByPaymentID(ctx context.Context, id string) (
 	return transaction, nil
 }
 
+func (ds *TransactionDatastore) GetByStreamContractAddressAndChunkNum(ctx context.Context, sca string, chunkNum uint64) (*Transaction, error) {
+	tx, ok := dbrutil.DbTxFromContext(ctx)
+	if !ok {
+		sess := ds.conn.NewSession(nil)
+		tx, err := sess.Begin()
+		if err != nil {
+			return nil, err
+		}
+
+		defer func() {
+			err = tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
+	}
+
+	transaction := new(Transaction)
+	err := tx.
+		Select("*").
+		From(ds.table).
+		Where("stream_contract_address = ? AND chunk_num = ?", sca, chunkNum).
+		Limit(1).
+		LoadStruct(transaction)
+	if err != nil {
+		if err == dbr.ErrNotFound {
+			return nil, ErrTxNotFound
+		}
+		return nil, err
+	}
+
+	return transaction, nil
+}
+
 func (ds *TransactionDatastore) UnlockToCheckPayment(ctx context.Context, transaction *Transaction) error {
 	tx, ok := dbrutil.DbTxFromContext(ctx)
 	if !ok {

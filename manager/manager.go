@@ -13,6 +13,7 @@ import (
 	v1 "github.com/videocoin/cloud-api/billing/v1"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
 	usersv1 "github.com/videocoin/cloud-api/users/v1"
+	validatorv1 "github.com/videocoin/cloud-api/validator/v1"
 	"github.com/videocoin/cloud-billing/datastore"
 	"github.com/videocoin/cloud-pkg/dbrutil"
 )
@@ -367,6 +368,54 @@ func (m *Manager) MarkTransactionAsFailed(ctx context.Context, transaction *data
 	defer tx.RollbackUnlessCommitted()
 
 	err = m.ds.Transactions.MarkAsFailed(ctx, transaction)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func (m *Manager) MarkTransactionAsSuccededByValidatorEvent(ctx context.Context, event *validatorv1.Event) error {
+	ctx, _, tx, err := m.NewContext(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.RollbackUnlessCommitted()
+
+	transaction, err := m.ds.Transactions.GetByStreamContractAddressAndChunkNum(
+		ctx,
+		event.StreamContractAddress,
+		event.ChunkNum,
+	)
+	if err != nil {
+		return err
+	}
+
+	err = m.ds.Transactions.MarkAsSucceded(ctx, transaction)
+	if err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func (m *Manager) MarkTransactionAsCanceledByValidatorEvent(ctx context.Context, event *validatorv1.Event) error {
+	ctx, _, tx, err := m.NewContext(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.RollbackUnlessCommitted()
+
+	transaction, err := m.ds.Transactions.GetByStreamContractAddressAndChunkNum(
+		ctx,
+		event.StreamContractAddress,
+		event.ChunkNum,
+	)
+	if err != nil {
+		return err
+	}
+
+	err = m.ds.Transactions.MarkAsCanceled(ctx, transaction)
 	if err != nil {
 		return err
 	}
