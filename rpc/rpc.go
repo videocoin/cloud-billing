@@ -132,6 +132,31 @@ func (s *Server) GetCharges(ctx context.Context, req *prototypes.Empty) (*v1.Cha
 	resp := &v1.ChargesResponse{
 		Items: []*v1.ChargeResponse{},
 	}
+
+	userID, err := s.authenticate(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	logger := s.logger.WithField("user_id", userID)
+
+	account, err := s.dm.GetAccountByUserID(ctx, userID)
+	if err != nil {
+		if err == datastore.ErrAccountNotFound {
+			return resp, nil
+		}
+		logger.Errorf("failed to get account by user id: %s", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	charges, err := s.dm.GetCharges(ctx, account)
+	if err != nil {
+		logger.Errorf("failed to get charges: %s", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	resp.Items = charges
+
 	return resp, nil
 }
 
@@ -139,5 +164,30 @@ func (s *Server) GetTransactions(ctx context.Context, req *prototypes.Empty) (*v
 	resp := &v1.TransactionsResponse{
 		Items: []*v1.TransactionResponse{},
 	}
+
+	userID, err := s.authenticate(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	logger := s.logger.WithField("user_id", userID)
+
+	account, err := s.dm.GetAccountByUserID(ctx, userID)
+	if err != nil {
+		if err == datastore.ErrAccountNotFound {
+			return resp, nil
+		}
+		logger.Errorf("failed to get account by user id: %s", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	transactions, err := s.dm.GetTransactions(ctx, account)
+	if err != nil {
+		logger.Errorf("failed to get transactions: %s", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	resp.Items = transactions
+
 	return resp, nil
 }

@@ -375,3 +375,61 @@ func (ds *TransactionDatastore) CalcBalance(ctx context.Context, account *Accoun
 
 	return balance, nil
 }
+
+func (ds *TransactionDatastore) GetCharges(ctx context.Context, account *Account) ([]*v1.ChargeResponse, error) {
+	tx, ok := dbrutil.DbTxFromContext(ctx)
+	if !ok {
+		sess := ds.conn.NewSession(nil)
+		tx, err := sess.Begin()
+		if err != nil {
+			return nil, err
+		}
+
+		defer func() {
+			err = tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
+	}
+
+	charges := []*v1.ChargeResponse{}
+	_, err := tx.
+		Select(
+			"date(created_at) as created_at",
+			"stream_name",
+			"stream_is_live",
+			"profile_name",
+			"SUM(duration) AS duration",
+			"AVG(profile_cost) AS cost",
+			"SUM(amount)/100 AS total_cost",
+		).
+		From(ds.table).
+		Where("`from` = ? AND status = ?", account.ID, v1.TransactionStatusSuccess).
+		GroupBy("date(created_at)", "stream_name", "stream_is_live", "profile_name").
+		OrderBy("date(created_at) DESC").
+		Load(&charges)
+	if err != nil {
+		return nil, err
+	}
+
+	return charges, nil
+}
+
+func (ds *TransactionDatastore) GetTransactions(ctx context.Context, account *Account) ([]*v1.TransactionResponse, error) {
+	// tx, ok := dbrutil.DbTxFromContext(ctx)
+	// if !ok {
+	// 	sess := ds.conn.NewSession(nil)
+	// 	tx, err := sess.Begin()
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+
+	// 	defer func() {
+	// 		err = tx.Commit()
+	// 		tx.RollbackUnlessCommitted()
+	// 	}()
+	// }
+
+	transactions := []*v1.TransactionResponse{}
+
+	return transactions, nil
+}
