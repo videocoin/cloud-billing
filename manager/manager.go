@@ -223,7 +223,7 @@ func (m *Manager) CreateTransaction(ctx context.Context, transaction *datastore.
 	return tx.Commit()
 }
 
-func (m *Manager) CreateTransactionFromEvent(ctx context.Context, event *dispatcherv1.Event) (*datastore.Transaction, error) {
+func (m *Manager) CreateTransactionFromDispatcherEvent(ctx context.Context, event *dispatcherv1.Event) (*datastore.Transaction, error) {
 	ctx, _, tx, err := m.NewContext(ctx)
 	if err != nil {
 		return nil, err

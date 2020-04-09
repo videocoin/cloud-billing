@@ -97,9 +97,10 @@ func (e *EventBus) handleDispatcherEvent(d amqp.Delivery) error {
 
 	switch req.Type {
 	case dispatcherv1.EventTypeTaskCompleted:
-		_, err := e.dm.CreateTransactionFromEvent(ctx, req)
+	case dispatcherv1.EventTypeSegementTranscoded:
+		_, err := e.dm.CreateTransactionFromDispatcherEvent(ctx, req)
 		if err != nil {
-			e.logger.Errorf("failed to create segment transcoded transcation: %s", err)
+			e.logger.Errorf("failed to create transcation from dispatcher event: %s", err)
 			return nil
 		}
 	}
