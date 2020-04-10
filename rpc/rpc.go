@@ -191,3 +191,33 @@ func (s *Server) GetTransactions(ctx context.Context, req *prototypes.Empty) (*v
 
 	return resp, nil
 }
+
+func (s *Server) GetChartCharges(ctx context.Context, req *prototypes.Empty) (*v1.ChartChargesResponse, error) {
+	userID, err := s.authenticate(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	logger := s.logger.WithField("user_id", userID)
+
+	resp := NewFillChartChargesResponse()
+
+	account, err := s.dm.GetAccountByUserID(ctx, userID)
+	if err != nil {
+		if err == datastore.ErrAccountNotFound {
+			return resp, nil
+		}
+		logger.Errorf("failed to get account by user id: %s", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	charges, err := s.dm.GetCharges(ctx, account)
+	if err != nil {
+		logger.Errorf("failed to get charges: %s", err)
+		return nil, rpc.ErrRpcInternal
+	}
+
+	FillChartChargesResponseWithData(resp, charges)
+
+	return resp, nil
+}

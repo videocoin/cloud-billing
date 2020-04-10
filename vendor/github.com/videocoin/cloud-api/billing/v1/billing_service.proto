@@ -40,6 +40,12 @@ service BillingService {
             get: "/api/v1/billing/transactions"
         };
     }
+
+    rpc GetChartCharges(google.protobuf.Empty) returns (ChartChargesResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/billing/charts/charges"
+        };
+    }
 }
 
 message MakePaymentRequest {
@@ -80,4 +86,14 @@ message TransactionResponse {
 
 message TransactionsResponse {
     repeated TransactionResponse items = 1;
+}
+
+message ChartChargeResponse {
+    string name = 1;
+    double live = 2;
+    double vod = 3;
+}
+
+message ChartChargesResponse {
+    repeated ChartChargeResponse items = 1;
 }
