@@ -52,7 +52,7 @@ func CalcChargeAmountByDate(charges []*v1.ChargeResponse, isLive bool, d time.Ti
 		}
 
 		if d.Year() == item.CreatedAt.Year() && d.Month() == item.CreatedAt.Month() && d.Day() == item.CreatedAt.Day() {
-			value += item.TotalCost
+			value += item.Duration
 		}
 	}
 
