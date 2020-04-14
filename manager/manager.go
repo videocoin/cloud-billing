@@ -70,11 +70,11 @@ func (m *Manager) checkPaymentStatus() {
 
 		pi, err := paymentintent.Get(transaction.PaymentIntentID.String, nil)
 		if err != nil {
-			m.logger.Errorf("failed to get payment intent: %s", err)
+			logger.Errorf("failed to get payment intent: %s", err)
 			continue
 		}
 
-		logger = m.logger.WithField("pi_id", transaction.ID)
+		logger = logger.WithField("pi_id", transaction.ID)
 
 		switch pi.Status {
 		case stripe.PaymentIntentStatusSucceeded:
@@ -462,15 +462,13 @@ func (m *Manager) GetBalance(ctx context.Context, account *datastore.Account) (f
 }
 
 func (m *Manager) GetCharges(ctx context.Context, account *datastore.Account) ([]*v1.ChargeResponse, error) {
-	charges := []*v1.ChargeResponse{}
-
 	ctx, _, tx, err := m.NewContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer tx.RollbackUnlessCommitted()
 
-	charges, err = m.ds.Transactions.GetCharges(ctx, account)
+	charges, err := m.ds.Transactions.GetCharges(ctx, account)
 	if err != nil {
 		return nil, err
 	}
@@ -483,15 +481,13 @@ func (m *Manager) GetCharges(ctx context.Context, account *datastore.Account) ([
 }
 
 func (m *Manager) GetTransactions(ctx context.Context, account *datastore.Account) ([]*v1.TransactionResponse, error) {
-	transactions := []*v1.TransactionResponse{}
-
 	ctx, _, tx, err := m.NewContext(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer tx.RollbackUnlessCommitted()
 
-	transactions, err = m.ds.Transactions.GetTransactions(ctx, account)
+	transactions, err := m.ds.Transactions.GetTransactions(ctx, account)
 	if err != nil {
 		return nil, err
 	}
