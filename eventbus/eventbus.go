@@ -216,7 +216,7 @@ func (e *EventBus) handleEmitterEvent(d amqp.Delivery) error {
 		transaction := &datastore.Transaction{
 			From:   datastore.BankAccountID,
 			To:     account.ID,
-			Amount: float64(10000),
+			Amount: float64(1000),
 			Status: v1.TransactionStatusSuccess,
 		}
 		err = e.dm.CreateTransaction(ctx, transaction)
