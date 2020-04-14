@@ -105,12 +105,14 @@ func (e *EventBus) handleDispatcherEvent(d amqp.Delivery) error {
 
 	switch req.Type {
 	case dispatcherv1.EventTypeTaskCompleted:
+		logger.Info("handling task completed event")
 		_, err := e.dm.CreateTransactionFromDispatcherEvent(ctx, req)
 		if err != nil {
 			logger.Errorf("failed to create transcation from dispatcher event: %s", err)
 			return nil
 		}
 	case dispatcherv1.EventTypeSegementTranscoded:
+		logger.Info("handling segment transcoded event")
 		_, err := e.dm.CreateTransactionFromDispatcherEvent(ctx, req)
 		if err != nil {
 			logger.Errorf("failed to create transcation from dispatcher event: %s", err)
@@ -155,12 +157,14 @@ func (e *EventBus) handleValidatorEvent(d amqp.Delivery) error {
 
 	switch req.Type {
 	case validatorv1.EventTypeValidatedProof:
+		logger.Info("handling validated proof event")
 		err := e.dm.MarkTransactionAsSuccededByValidatorEvent(ctx, req)
 		if err != nil {
 			logger.Errorf("failed to mark transaction as succeded by validator event: %s", err)
 			return nil
 		}
 	case validatorv1.EventTypeScrapedProof:
+		logger.Info("handling scrapped proof event")
 		err := e.dm.MarkTransactionAsCanceledByValidatorEvent(ctx, req)
 		if err != nil {
 			logger.Errorf("failed to mark transaction as canceled by validator event: %s", err)
