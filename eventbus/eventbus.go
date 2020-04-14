@@ -8,8 +8,11 @@ import (
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
+	v1 "github.com/videocoin/cloud-api/billing/v1"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
+	emitterv1 "github.com/videocoin/cloud-api/emitter/v1"
 	validatorv1 "github.com/videocoin/cloud-api/validator/v1"
+	"github.com/videocoin/cloud-billing/datastore"
 	"github.com/videocoin/cloud-billing/manager"
 	"github.com/videocoin/cloud-pkg/mqmux"
 	tracerext "github.com/videocoin/cloud-pkg/tracer"
@@ -50,6 +53,11 @@ func (e *EventBus) Start() error {
 	}
 
 	err = e.mq.Consumer("validator.events", 1, false, e.handleValidatorEvent)
+	if err != nil {
+		return err
+	}
+
+	err = e.mq.Consumer("emitter.events", 1, false, e.handleEmitterEvent)
 	if err != nil {
 		return err
 	}
@@ -159,5 +167,64 @@ func (e *EventBus) handleValidatorEvent(d amqp.Delivery) error {
 			return nil
 		}
 	}
+	return nil
+}
+
+func (e *EventBus) handleEmitterEvent(d amqp.Delivery) error {
+	var span opentracing.Span
+	tracer := opentracing.GlobalTracer()
+	spanCtx, err := tracer.Extract(opentracing.TextMap, mqmux.RMQHeaderCarrier(d.Headers))
+
+	e.logger.Debugf("handling body: %+v", string(d.Body))
+
+	if err != nil {
+		span = tracer.StartSpan("eventbus.handleEmitterEvent")
+	} else {
+		span = tracer.StartSpan("eventbus.handleEmitterEvent", ext.RPCServerOption(spanCtx))
+	}
+
+	defer span.Finish()
+
+	req := new(emitterv1.Event)
+	err = json.Unmarshal(d.Body, req)
+	if err != nil {
+		tracerext.SpanLogError(span, err)
+		return err
+	}
+
+	span.SetTag("event_type", req.Type.String())
+
+	logger := e.logger.WithFields(logrus.Fields{
+		"event_type": req.Type.String(),
+		"user_id":    req.UserID,
+		"address":    req.Address,
+	})
+	logger.Debugf("handling request %+v", req)
+
+	ctx := opentracing.ContextWithSpan(context.Background(), span)
+
+	switch req.Type {
+	case emitterv1.EventTypeAccountCreated:
+		logger.Info("creating billing account")
+
+		account, err := e.dm.GetOrCreateAccountByUserID(ctx, req.UserID)
+		if err != nil {
+			logger.Errorf("failed to create account: %s", err)
+			return nil
+		}
+
+		transaction := &datastore.Transaction{
+			From:   datastore.BankAccountID,
+			To:     account.ID,
+			Amount: float64(10000),
+			Status: v1.TransactionStatusSuccess,
+		}
+		err = e.dm.CreateTransaction(ctx, transaction)
+		if err != nil {
+			logger.Errorf("failed to create first transaction: %s", err)
+			return nil
+		}
+	}
+
 	return nil
 }
