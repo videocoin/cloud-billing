@@ -132,6 +132,7 @@ github.com/valyala/bytebufferpool
 github.com/valyala/fasttemplate
 # github.com/videocoin/cloud-api v0.0.17 => ../cloud-api
 github.com/videocoin/cloud-api/accounts/v1
+github.com/videocoin/cloud-api/billing/private/v1
 github.com/videocoin/cloud-api/billing/v1
 github.com/videocoin/cloud-api/dispatcher/v1
 github.com/videocoin/cloud-api/emitter/v1

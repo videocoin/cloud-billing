@@ -10,6 +10,8 @@ service:
   type: ClusterIP
   externalRpcPort: 5020
   internalRpcPort: 5020
+  externalPRpcPort: 5120
+  internalPRpcPort: 5120
   externalWHPort: 5028
   internalWHPort: 5028
 

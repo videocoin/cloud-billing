@@ -16,6 +16,10 @@ spec:
       targetPort: {{ .Values.service.internalRpcPort }}
       protocol: TCP
       name: grpc
+    - port: {{ .Values.service.externalPRpcPort }}
+      targetPort: {{ .Values.service.internalPRpcPort }}
+      protocol: TCP
+      name: pgrpc
     - port: {{ .Values.service.externalWHPort }}
       targetPort: {{ .Values.service.internalWHPort }}
       protocol: TCP

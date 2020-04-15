@@ -10,6 +10,7 @@ type Config struct {
 	Logger  *logrus.Entry `envconfig:"-"`
 
 	RPCAddr              string `envconfig:"RPC_ADDR" default:"0.0.0.0:5020"`
+	PRPCAddr             string `envconfig:"PRPC_ADDR" default:"0.0.0.0:5120"`
 	StripeHookServerAddr string `envconfig:"STRIPE_HOOK_SERVER_ADDR" default:"0.0.0.0:5028"`
 	UsersRPCAddr         string `envconfig:"USERS_RPC_ADDR" default:"0.0.0.0:5000"`
 	AccountsRPCAddr      string `envconfig:"ACCOUNTS_RPC_ADDR" default:"0.0.0.0:5001"`

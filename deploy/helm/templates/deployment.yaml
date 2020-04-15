@@ -40,6 +40,8 @@ spec:
               value: "6831"
             - name: RPC_ADDR
               value: 0.0.0.0:{{ .Values.service.internalRpcPort }}
+            - name: PRPC_ADDR
+              value: 0.0.0.0:{{ .Values.service.internalPRpcPort }}
             - name: STRIPE_HOOK_SERVER_ADDR
               value: 0.0.0.0:{{ .Values.service.internalWHPort }}
             - name: ACCOUNTS_RPC_ADDR

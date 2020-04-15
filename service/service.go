@@ -5,16 +5,18 @@ import (
 	"github.com/videocoin/cloud-billing/datastore"
 	"github.com/videocoin/cloud-billing/eventbus"
 	"github.com/videocoin/cloud-billing/manager"
+	"github.com/videocoin/cloud-billing/prpc"
 	"github.com/videocoin/cloud-billing/rpc"
 	"github.com/videocoin/cloud-billing/stripehook"
 )
 
 type Service struct {
-	cfg *Config
-	rpc *rpc.Server
-	eb  *eventbus.EventBus
-	dm  *manager.Manager
-	shs *stripehook.Server
+	cfg  *Config
+	rpc  *rpc.Server
+	prpc *prpc.Server
+	eb   *eventbus.EventBus
+	dm   *manager.Manager
+	shs  *stripehook.Server
 }
 
 func NewService(cfg *Config) (*Service, error) {
@@ -45,6 +47,16 @@ func NewService(cfg *Config) (*Service, error) {
 		return nil, err
 	}
 
+	prpc, err := prpc.NewServer(
+		prpc.WithAddr(cfg.PRPCAddr),
+		prpc.WithLogger(cfg.Logger.WithField("system", "prpc")),
+		prpc.WithGRPCDefaultOpts(),
+		prpc.WithDataManager(dm),
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	eb, err := eventbus.NewEventBus(
 		cfg.MQURI,
 		eventbus.WithName(cfg.Name),
@@ -68,11 +80,12 @@ func NewService(cfg *Config) (*Service, error) {
 	}
 
 	svc := &Service{
-		cfg: cfg,
-		rpc: rpc,
-		eb:  eb,
-		dm:  dm,
-		shs: shs,
+		cfg:  cfg,
+		rpc:  rpc,
+		prpc: prpc,
+		eb:   eb,
+		dm:   dm,
+		shs:  shs,
 	}
 
 	return svc, nil
@@ -82,6 +95,11 @@ func (s *Service) Start(errCh chan error) {
 	go func() {
 		s.cfg.Logger.Info("starting rpc server")
 		errCh <- s.rpc.Start()
+	}()
+
+	go func() {
+		s.cfg.Logger.Info("starting private rpc server")
+		errCh <- s.prpc.Start()
 	}()
 
 	go func() {
