@@ -480,6 +480,25 @@ func (m *Manager) GetCharges(ctx context.Context, account *datastore.Account) ([
 	return charges, nil
 }
 
+func (m *Manager) GetChargesAll(ctx context.Context) ([]*v1.ChargeResponse, error) {
+	ctx, _, tx, err := m.NewContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.RollbackUnlessCommitted()
+
+	charges, err := m.ds.Transactions.GetChargesAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return charges, nil
+}
+
 func (m *Manager) GetTransactions(ctx context.Context, account *datastore.Account) ([]*v1.TransactionResponse, error) {
 	ctx, _, tx, err := m.NewContext(ctx)
 	if err != nil {

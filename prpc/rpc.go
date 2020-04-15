@@ -35,24 +35,13 @@ func (s *Server) GetProfileByUserID(ctx context.Context, req *pv1.ProfileRequest
 }
 
 func (s *Server) GetCharges(ctx context.Context, req *pv1.ChargesRequest) (*v1.ChargesResponse, error) {
-	logger := s.logger.WithField("user_id", req.UserID)
-
 	resp := &v1.ChargesResponse{
 		Items: []*v1.ChargeResponse{},
 	}
 
-	account, err := s.dm.GetAccountByUserID(ctx, req.UserID)
+	charges, err := s.dm.GetChargesAll(ctx)
 	if err != nil {
-		if err == datastore.ErrAccountNotFound {
-			return resp, nil
-		}
-		logger.Errorf("failed to get account by user id: %s", err)
-		return nil, rpc.ErrRpcInternal
-	}
-
-	charges, err := s.dm.GetCharges(ctx, account)
-	if err != nil {
-		logger.Errorf("failed to get charges: %s", err)
+		s.logger.Errorf("failed to get charges all: %s", err)
 		return nil, rpc.ErrRpcInternal
 	}
 

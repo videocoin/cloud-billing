@@ -416,6 +416,46 @@ func (ds *TransactionDatastore) GetCharges(ctx context.Context, account *Account
 	return charges, nil
 }
 
+func (ds *TransactionDatastore) GetChargesAll(ctx context.Context) ([]*v1.ChargeResponse, error) {
+	tx, ok := dbrutil.DbTxFromContext(ctx)
+	if !ok {
+		sess := ds.conn.NewSession(nil)
+		tx, err := sess.Begin()
+		if err != nil {
+			return nil, err
+		}
+
+		defer func() {
+			err = tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
+	}
+
+	charges := []*v1.ChargeResponse{}
+	_, err := tx.
+		Select(
+			"date(created_at) as created_at",
+			"stream_id",
+			"stream_name",
+			"stream_is_live",
+			"profile_id AS stream_profile_id",
+			"profile_name AS stream_profile_name",
+			"SUM(duration) AS duration",
+			"AVG(profile_cost) AS cost",
+			"SUM(amount)/100 AS total_cost",
+		).
+		From(ds.table).
+		Where("status = ? AND stream_id IS NOT NULL", v1.TransactionStatusSuccess).
+		GroupBy("date(created_at)", "stream_id", "stream_name", "stream_is_live", "stream_profile_id", "stream_profile_name").
+		OrderBy("date(created_at) DESC").
+		Load(&charges)
+	if err != nil {
+		return nil, err
+	}
+
+	return charges, nil
+}
+
 func (ds *TransactionDatastore) GetTransactions(ctx context.Context, account *Account) ([]*v1.TransactionResponse, error) {
 	tx, ok := dbrutil.DbTxFromContext(ctx)
 	if !ok {
