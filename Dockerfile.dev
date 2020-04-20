@@ -1,0 +1,7 @@
+FROM golang:1.14
+
+MAINTAINER VideoCoin
+
+WORKDIR /go/src/github.com/videocoin/cloud-billing
+
+CMD go run cmd/main.go

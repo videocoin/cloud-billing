@@ -28,11 +28,7 @@ deps:
 lint: docker-lint
 
 docker-lint:
-	docker run --rm \
-		-v `PWD`:/go/src/github.com/videocoin/cloud-sync \
-		-w /go/src/github.com/videocoin/cloud-sync \
-		golangci/golangci-lint:v1.23.6 \
-		golangci-lint run -v
+	docker build -f Dockerfile.lint .
 
 docker-build:
 	docker build -t gcr.io/${GCP_PROJECT}/${NAME}:${VERSION} -f Dockerfile .
