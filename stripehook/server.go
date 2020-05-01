@@ -5,21 +5,22 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	"github.com/videocoin/cloud-billing/datastore"
-
 	"github.com/labstack/echo"
 	"github.com/sirupsen/logrus"
 	"github.com/stripe/stripe-go"
 	"github.com/stripe/stripe-go/webhook"
+	emitterv1 "github.com/videocoin/cloud-api/emitter/v1"
+	"github.com/videocoin/cloud-billing/datastore"
 	"github.com/videocoin/cloud-billing/manager"
 )
 
 type Server struct {
-	addr   string
-	secret string
-	logger *logrus.Entry
-	e      *echo.Echo
-	dm     *manager.Manager
+	addr    string
+	secret  string
+	logger  *logrus.Entry
+	e       *echo.Echo
+	dm      *manager.Manager
+	emitter emitterv1.EmitterServiceClient
 }
 
 func NewServer(addr string, opts ...Option) (*Server, error) {
@@ -72,25 +73,47 @@ func (s *Server) postHook(c echo.Context) error {
 		var pi stripe.PaymentIntent
 		err := json.Unmarshal(event.Data.Raw, &pi)
 		if err != nil {
-			s.logger.Errorf("failed to unmarshal event: %s", err)
+			s.logger.WithError(err).Errorf("failed to unmarshal event")
 			return echo.ErrBadRequest
 		}
 
 		s.logger.Debugf("payment intent %+v", pi)
 
 		ctx := context.Background()
+
+		logger := s.logger.WithField("pi_id", pi.ID)
+
 		transaction, err := s.dm.GetTransactionByPaymentID(ctx, pi.ID)
 		if err != nil {
 			if err == datastore.ErrTxNotFound {
 				return nil
 			}
-			s.logger.Errorf("failed to get transaction by payment id: %s", err)
+			logger.WithError(err).Errorf("failed to get transaction by payment id")
 			return echo.ErrInternalServerError
 		}
 
 		err = s.dm.MarkTransactionAsSucceded(ctx, transaction)
 		if err != nil {
-			s.logger.Errorf("failed to mark transaction as succeded: %s", err)
+			logger.WithError(err).Error("failed to mark transaction as succeded")
+			return echo.ErrInternalServerError
+		}
+
+		logger = logger.WithField("to", transaction.To)
+
+		account, err := s.dm.GetAccountByID(ctx, transaction.To)
+		if err != nil {
+			logger.WithError(err).Errorf("failed to mark transaction as succeded")
+			return echo.ErrInternalServerError
+		}
+
+		logger = logger.
+			WithField("account_id", account.ID).
+			WithField("user_id", account.UserID)
+
+		afReq := &emitterv1.AddFundsRequest{UserID: account.UserID}
+		_, err = s.emitter.AddFunds(ctx, afReq)
+		if err != nil {
+			logger.WithError(err).Error("failed add funds")
 			return echo.ErrInternalServerError
 		}
 	default:

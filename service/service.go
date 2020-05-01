@@ -74,6 +74,7 @@ func NewService(cfg *Config) (*Service, error) {
 		stripehook.WithLogger(cfg.Logger.WithField("system", "stripehook")),
 		stripehook.WithSecret(cfg.StripeWHSecret),
 		stripehook.WithDataManager(dm),
+		stripehook.WithEmitterServiceClient(cfg.EmitterRPCAddr),
 	)
 	if err != nil {
 		return nil, err

@@ -90,6 +90,33 @@ func (ds *AccountDatastore) GetByUserID(ctx context.Context, userID string) (*Ac
 	return account, nil
 }
 
+func (ds *AccountDatastore) GetByID(ctx context.Context, id string) (*Account, error) {
+	tx, ok := dbrutil.DbTxFromContext(ctx)
+	if !ok {
+		sess := ds.conn.NewSession(nil)
+		tx, err := sess.Begin()
+		if err != nil {
+			return nil, err
+		}
+
+		defer func() {
+			err = tx.Commit()
+			tx.RollbackUnlessCommitted()
+		}()
+	}
+
+	account := new(Account)
+	err := tx.Select("*").From(ds.table).Where("id = ?", id).LoadStruct(account)
+	if err != nil {
+		if err == dbr.ErrNotFound {
+			return nil, ErrAccountNotFound
+		}
+		return nil, err
+	}
+
+	return account, nil
+}
+
 func (ds *AccountDatastore) UpdateCustomer(ctx context.Context, account *Account, customerID string) error {
 	tx, ok := dbrutil.DbTxFromContext(ctx)
 	if !ok {

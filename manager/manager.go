@@ -123,7 +123,7 @@ func (m *Manager) unlockAllTransactions() {
 }
 
 func (m *Manager) NewContext(ctx context.Context) (context.Context, *dbr.Session, *dbr.Tx, error) {
-	dbLogger := dbrutil.NewDatastoreLogger(m.logger)
+	dbLogger := dbrutil.NewLogrusLogger(m.logger)
 	sess := m.ds.NewSession(dbLogger)
 	tx, err := sess.Begin()
 	if err != nil {
@@ -181,6 +181,26 @@ func (m *Manager) GetAccountByUserID(ctx context.Context, userID string) (*datas
 	defer tx.RollbackUnlessCommitted()
 
 	account, err := m.ds.Accounts.GetByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return nil, err
+	}
+
+	return account, nil
+}
+
+func (m *Manager) GetAccountByID(ctx context.Context, id string) (*datastore.Account, error) {
+	ctx, _, tx, err := m.NewContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.RollbackUnlessCommitted()
+
+	account, err := m.ds.Accounts.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}

@@ -2,7 +2,9 @@ package stripehook
 
 import (
 	"github.com/sirupsen/logrus"
+	emitterv1 "github.com/videocoin/cloud-api/emitter/v1"
 	"github.com/videocoin/cloud-billing/manager"
+	"github.com/videocoin/cloud-pkg/grpcutil"
 )
 
 type Option func(*Server) error
@@ -24,6 +26,17 @@ func WithSecret(secret string) Option {
 func WithDataManager(dm *manager.Manager) Option {
 	return func(s *Server) error {
 		s.dm = dm
+		return nil
+	}
+}
+
+func WithEmitterServiceClient(addr string) Option {
+	return func(s *Server) error {
+		conn, err := grpcutil.Connect(addr, s.logger.WithField("system", "emitter"))
+		if err != nil {
+			return err
+		}
+		s.emitter = emitterv1.NewEmitterServiceClient(conn)
 		return nil
 	}
 }

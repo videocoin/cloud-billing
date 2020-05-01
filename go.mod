@@ -22,6 +22,6 @@ require (
 	github.com/stripe/stripe-go v70.9.0+incompatible
 	github.com/videocoin/cloud-api v0.0.17
 	github.com/videocoin/cloud-pkg v0.0.5
-	google.golang.org/grpc v1.21.1
+	google.golang.org/grpc v1.27.1
 	gopkg.in/go-playground/validator.v9 v9.31.0
 )

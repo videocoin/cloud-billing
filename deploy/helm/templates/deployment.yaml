@@ -54,6 +54,11 @@ spec:
                 configMapKeyRef:
                   name: {{ .Chart.Name }}
                   key: usersRpcAddr
+            - name: EMITTER_RPC_ADDR
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Chart.Name }}
+                  key: emitterRpcAddr
             - name: DBURI
               valueFrom:
                 secretKeyRef:
