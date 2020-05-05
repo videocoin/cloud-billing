@@ -110,7 +110,10 @@ func (s *Server) postHook(c echo.Context) error {
 			WithField("account_id", account.ID).
 			WithField("user_id", account.UserID)
 
-		afReq := &emitterv1.AddFundsRequest{UserID: account.UserID}
+		afReq := &emitterv1.AddFundsRequest{
+			UserID:    account.UserID,
+			AmountUsd: transaction.Amount / 100,
+		}
 		_, err = s.emitter.AddFunds(ctx, afReq)
 		if err != nil {
 			logger.WithError(err).Error("failed add funds")
