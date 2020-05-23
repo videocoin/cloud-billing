@@ -66,7 +66,7 @@ option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
 };
 
 service MinersService {
-    rpc Create(google.protobuf.Empty) returns (MinerResponse) {
+    rpc Create(CreateMinerRequest) returns (MinerResponse) {
         option (google.api.http) = {
             post: "/api/v1/miners",
             body: "*"
@@ -120,11 +120,13 @@ service MinersService {
     rpc GetMinersWithForceTask(google.protobuf.Empty) returns (MinersWithForceTaskResponse) {}
     rpc GetMinersCandidates(MinersCandidatesRequest) returns (MinersCandidatesResponse) {}
     rpc GetKey(KeyRequest) returns (KeyResponse) {}
+    rpc GetInternalMiner(InternalMinerRequest) returns (InternalMinerResponse) {}
 }
 
 message RegistrationRequest {
     string client_id = 1 [(gogoproto.customname) = "ClientID"];
     string address = 2;
+    string version = 3;
 }
 
 message MinerRequest {
@@ -136,6 +138,11 @@ message UpdateMinerRequest {
     string name = 2;
 }
 
+message CreateMinerRequest {
+    string k = 1;
+    string s = 2;
+}
+
 message MinerResponse {
     string id = 1;
     string name = 2;
@@ -145,6 +152,11 @@ message MinerResponse {
     CapacityInfo capacity_info = 6;
     string user_id = 7 [(gogoproto.customname) = "UserID"];
     string address = 8;
+    double reward = 9;
+	double total_stake = 10;           
+	double self_stake = 11;     
+    double delegated_stake = 12;
+    bool is_block = 13;
 }
 
 message MinerListResponse {
@@ -194,7 +206,8 @@ message MinersCandidatesRequest {
 
 message MinerCandidateResponse {
     string id = 1 [(gogoproto.customname) = "ID"];
-    int32 stake = 2;
+    double stake = 2;
+    bool is_internal = 3;
 }
 
 message MinersCandidatesResponse {
@@ -207,4 +220,13 @@ message KeyRequest {
 
 message KeyResponse {
     string key = 1;
+}
+
+message InternalMinerRequest {}
+
+message InternalMinerResponse {
+    string id = 1 [(gogoproto.customname) = "ID"];
+    string key = 2;
+    string secret = 3;
+    string task_id = 4 [(gogoproto.customname) = "TaskID"];
 }

@@ -20,6 +20,7 @@ option (gogoproto.messagename_all) = true;
 service DispatcherService {
   rpc GetInternalConfig(InternalConfigRequest) returns (InternalConfigResponse) {}
   rpc GetConfig(ConfigRequest) returns (ConfigResponse) {}
+  rpc GetDelegatorConfig(ConfigRequest) returns (ConfigResponse) {}
 
   rpc Register(cloud.api.miners.v1.RegistrationRequest) returns (google.protobuf.Empty) {}
   rpc Ping(cloud.api.miners.v1.PingRequest) returns (cloud.api.miners.v1.PingResponse) {}
@@ -35,7 +36,13 @@ service DispatcherService {
   rpc AddInputChunk(AddInputChunkRequest) returns (AddInputChunkResponse) {}
 }
 
-message TaskPendingRequest {}
+message TaskPendingRequest {
+  double total_stake = 1;
+  double capacity_encode = 2;
+  double capacity_cpu = 3;
+  string worker_state = 4;
+  string version = 5;
+}
 
 message TaskRequest {
   string id = 1 [(gogoproto.customname) = "ID"];
