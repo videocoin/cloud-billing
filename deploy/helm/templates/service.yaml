@@ -7,21 +7,17 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     heritage: {{ .Release.Service }}
 spec:
-  type: {{ .Values.service.type }}
-{{ if eq .Values.service.type "ClusterIP" }}
-  clusterIP: {{ .Values.service.clusterIP | default "None" | quote }}
-{{ end }}
   ports:
-    - port: {{ .Values.service.externalRpcPort }}
-      targetPort: {{ .Values.service.internalRpcPort }}
+    - port: {{ .Values.service.ports.grpc }}
+      targetPort: {{ .Values.service.ports.grpc }}
       protocol: TCP
       name: grpc
-    - port: {{ .Values.service.externalPRpcPort }}
-      targetPort: {{ .Values.service.internalPRpcPort }}
+    - port: {{ .Values.service.ports.pgrpc }}
+      targetPort: {{ .Values.service.ports.pgrpc }}
       protocol: TCP
       name: pgrpc
-    - port: {{ .Values.service.externalWHPort }}
-      targetPort: {{ .Values.service.internalWHPort }}
+    - port: {{ .Values.service.ports.stripewh }}
+      targetPort: {{ .Values.service.ports.stripewh }}
       protocol: TCP
       name: stripewh
   selector:
