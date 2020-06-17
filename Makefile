@@ -1,11 +1,12 @@
 GOOS?=linux
 GOARCH?=amd64
-
-GCP_PROJECT?=videocoin-network
 ENV?=dev
 
 NAME=billing
 VERSION?=$$(git describe --abbrev=0)-$$(git rev-parse --abbrev-ref HEAD)-$$(git rev-parse --short HEAD)
+
+REGISTRY_SERVER?=registry.videocoin.net
+REGISTRY_PROJECT?=cloud
 
 .PHONY: deploy
 
@@ -27,16 +28,16 @@ deps:
 
 lint: docker-lint
 
+release: docker-build docker-push
+
 docker-lint:
 	docker build -f Dockerfile.lint .
 
 docker-build:
-	docker build -t gcr.io/${GCP_PROJECT}/${NAME}:${VERSION} -f Dockerfile .
+	docker build -t ${REGISTRY_SERVER}/${REGISTRY_PROJECT}/${NAME}:${VERSION} -f Dockerfile .
 
 docker-push:
-	docker push gcr.io/${GCP_PROJECT}/${NAME}:${VERSION}
-
-release: docker-build docker-push
+	docker push ${REGISTRY_SERVER}/${REGISTRY_PROJECT}/${NAME}:${VERSION}
 
 deploy:
-	ENV=${ENV} deploy/deploy.sh
+	cd deploy && helm upgrade -i --wait --set image.tag="${VERSION}" -n console billing ./helm
