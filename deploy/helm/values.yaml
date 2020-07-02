@@ -36,14 +36,6 @@ config:
   ACCOUNTS_RPC_ADDR: "accounts.console.svc.cluster.local:5001"
   EMITTER_RPC_ADDR: "emitter.console.svc.cluster.local:5003"
 
-ingress:
-  enabled: true
-  host: bill.dev.videocoinapis.com
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-dns-prod
-    kubernetes.io/ingress.class: nginx
-  secret: tls-cert-cloud-billing
-
 annotations:
   vault.hashicorp.com/agent-inject: "true"
   vault.hashicorp.com/role: "console-billing"
