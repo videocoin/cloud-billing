@@ -13,6 +13,7 @@ steps:
       registry: registry.videocoin.net
       repo: registry.videocoin.net/cloud/billing
       tags:
+        - latest
         - ${DRONE_COMMIT_SHA}
   - name: deploy
     image: devth/helm:v3.1.1
@@ -27,7 +28,6 @@ trigger:
   event:
     - push
   branch:
-    - drone
     - infra
 
 ---
