@@ -1,14 +1,12 @@
 {{- if .Values.ingress.enabled -}}
-{{- $releaseName := .Release.Name -}}
+{{- $releaseName := .Chart.Name -}}
 {{- $svcPort := .Values.service.ports.stripewh -}}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ .Chart.Name }}
   labels:
-    app: {{ .Release.Name }}
-    chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    heritage: {{ .Release.Service }}
+    app: {{ .Chart.Name }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
