@@ -42,13 +42,13 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-dns-prod
     kubernetes.io/ingress.class: nginx
   hosts:
-    - host: console.dev.videocoin.net
+    - host: console.dev.videocoin.network
       paths:
         - "/api/v1/stripe"
   tls:
     - secretName: tls-cert-console-billing
       hosts:
-        - console.dev.videocoin.net
+        - console.dev.videocoin.network
 
 annotations:
   vault.hashicorp.com/agent-inject: "true"
