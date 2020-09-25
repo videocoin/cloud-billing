@@ -12,6 +12,7 @@ import (
 	"github.com/stripe/stripe-go/paymentintent"
 	v1 "github.com/videocoin/cloud-api/billing/v1"
 	dispatcherv1 "github.com/videocoin/cloud-api/dispatcher/v1"
+	emitterv1 "github.com/videocoin/cloud-api/emitter/v1"
 	usersv1 "github.com/videocoin/cloud-api/users/v1"
 	validatorv1 "github.com/videocoin/cloud-api/validator/v1"
 	"github.com/videocoin/cloud-billing/datastore"
@@ -24,6 +25,7 @@ type Manager struct {
 	logger    *logrus.Entry
 	ds        *datastore.Datastore
 	users     usersv1.UserServiceClient
+	emitter   emitterv1.EmitterServiceClient
 }
 
 func New(opts ...Option) (*Manager, error) {
@@ -79,6 +81,28 @@ func (m *Manager) checkPaymentStatus() {
 
 		switch pi.Status {
 		case stripe.PaymentIntentStatusSucceeded:
+			if transaction.From == datastore.BankAccountID {
+				account, err := m.GetAccountByID(ctx, transaction.To)
+				if err != nil {
+					logger.WithError(err).Errorf("failed to get account by id")
+					continue
+				}
+
+				logger = logger.
+					WithField("account_id", account.ID).
+					WithField("user_id", account.UserID)
+
+				afReq := &emitterv1.AddFundsRequest{
+					UserID:    account.UserID,
+					AmountUsd: transaction.Amount / 100,
+				}
+				_, err = m.emitter.AddFunds(ctx, afReq)
+				if err != nil {
+					logger.WithError(err).Errorf("failed to add funds")
+					continue
+				}
+			}
+
 			logger.Info("marking transaction as succeeded")
 			err = m.MarkTransactionAsSucceded(ctx, transaction)
 			if err != nil {
