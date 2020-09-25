@@ -28,7 +28,7 @@ type Manager struct {
 
 func New(opts ...Option) (*Manager, error) {
 	ds := &Manager{
-		cpsticker: time.NewTicker(time.Second * 30),
+		cpsticker: time.NewTicker(time.Second * 10),
 		uatticker: time.NewTicker(time.Second * 60),
 	}
 	for _, o := range opts {
@@ -93,7 +93,6 @@ func (m *Manager) checkPaymentStatus() {
 				continue
 			}
 		default:
-			logger.Infof("payment intent status is %s", pi.Status)
 			if transaction.PaymentStatus.String != string(pi.Status) {
 				err = m.MarkTransactionPaymentStatusAs(ctx, transaction, pi.Status)
 				if err != nil {
