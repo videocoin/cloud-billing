@@ -405,7 +405,7 @@ func (ds *TransactionDatastore) GetCharges(ctx context.Context, account *Account
 			"SUM(amount)/100 AS total_cost",
 		).
 		From(ds.table).
-		Where("`from` = ? AND status = ?", account.ID, v1.TransactionStatusSuccess).
+		Where("stream_id is NOT NULL AND `from` = ? AND status = ?", account.ID, v1.TransactionStatusSuccess).
 		GroupBy("date(created_at)", "stream_id", "stream_name", "stream_is_live", "stream_profile_id", "stream_profile_name").
 		OrderBy("date(created_at) DESC").
 		Load(&charges)
