@@ -28,7 +28,7 @@ type Manager struct {
 
 func New(opts ...Option) (*Manager, error) {
 	ds := &Manager{
-		cpsticker: time.NewTicker(time.Second * 60 * 5),
+		cpsticker: time.NewTicker(time.Second * 30),
 		uatticker: time.NewTicker(time.Second * 60),
 	}
 	for _, o := range opts {
@@ -75,6 +75,7 @@ func (m *Manager) checkPaymentStatus() {
 		}
 
 		logger = logger.WithField("pi_id", transaction.ID)
+		logger.Infof("payment intent status is %s", pi.Status)
 
 		switch pi.Status {
 		case stripe.PaymentIntentStatusSucceeded:
